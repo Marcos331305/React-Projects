@@ -1,10 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import Navbar from '../reusedComponents/Navbar'
+import InputEnter from './otherComponents/InputEnter'
 
 const Home = () => {
   return (
-    <div>
-      Home
+    <div className='h-screen bg-[#000000]'>
+     <Navbar />
+     <InputEnter />
     </div>
   )
 }
