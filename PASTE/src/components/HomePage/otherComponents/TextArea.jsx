@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import copyIcon from '../../../assets/copy-icon.png'
 
-const TextArea = () => {
-  const [content,setContent] = useState('');
+const TextArea = ({content,setContent}) => {
   return (
     <div className='mt-7'>
       <div className='w-[80%] md:w-[700px] ml-[38px] bg-[#333333] border-t border-l border-r border-[#4A4848] h-[36px] rounded-tl-md rounded-tr-md px-4 flex items-center'>
@@ -17,7 +16,7 @@ const TextArea = () => {
           </div>
         </div>
       </div>
-      <textarea onChange={ (e) => setContent(e.target.value) } rows={25} placeholder='Write Your Content Here....' className='bg-[#0F0F0F] py-3 px-4 w-[80%] md:w-[700px] ml-[38px] outline-none text-white text-md rounded-md resize-none border-b border-l border-r border-[#4A4848]'></textarea>
+      <textarea value={content} onChange={ (e) => setContent(e.target.value) } rows={25} placeholder='Write Your Content Here....' className='bg-[#0F0F0F] py-3 px-4 w-[80%] md:w-[700px] ml-[38px] outline-none text-white text-md rounded-md resize-none border-b border-l border-r border-[#4A4848]'></textarea>
     </div>
   )
 }
