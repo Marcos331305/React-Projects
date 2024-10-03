@@ -1,12 +1,12 @@
 import React from 'react'
 import Navbar from '../reusedComponents/Navbar'
-import InputEnter from './otherComponents/InputEnter'
+import PasteApp from './otherComponents/PasteApp'
 
 const Home = () => {
   return (
-    <div className='h-screen bg-[#000000]'>
+    <div>
      <Navbar />
-     <InputEnter />
+     <PasteApp />
     </div>
   )
 }
