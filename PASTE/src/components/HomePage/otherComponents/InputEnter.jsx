@@ -10,9 +10,9 @@ const InputEnter = ({content, setContent}) => {
   const dispatch = useDispatch();
 
   return (
-    <div className='mt-7 flex flex-wrap gap-y-4'>
-      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder='Enter Title Here....' className='bg-[#0F0F0F] border border-[rgb(29,40,58)] rounded-[6px] w-[80%] h-12 outline-none text-white px-2 ml-[38px] sm:w-[400px] text-xl' />
-      <button onClick={() => handlePaste(pasteId,title,content,dispatch,setTitle,setContent,setSearchParams)} className='bg-[#6674CC] ml-[38px] text-white text-sm rounded-[6px] py-3 px-4'>{pasteId ? 'Update My Paste' : 'Create My Paste'}</button>
+    <div className='mt-7 sm:mt-12 flex flex-wrap sm:justify-center gap-y-4 gap-4 w-[94%]'>
+      <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder='Enter Title Here....' className='bg-[#0F0F0F] border border-[rgb(29,40,58)] rounded-[6px] w-full h-12 outline-none text-white px-3 sm:w-[545px] text-xl' />
+      <button onClick={() => handlePaste(pasteId,title,content,dispatch,setTitle,setContent,setSearchParams)} className='bg-[#6674CC] text-white text-sm rounded-[6px] py-3 px-4'>{pasteId ? 'Update My Paste' : 'Create My Paste'}</button>
     </div>
   )
 }

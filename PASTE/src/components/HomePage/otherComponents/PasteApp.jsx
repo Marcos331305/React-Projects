@@ -6,7 +6,7 @@ import { useState } from 'react'
 const PasteApp = () => {
   const [content,setContent] = useState('');
   return (
-    <div>
+    <div className='flex flex-col items-center'>
       <InputEnter content={content} setContent={setContent} />
       <TextArea content={content} setContent={setContent} />
     </div>

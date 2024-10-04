@@ -3,6 +3,6 @@ import pasteReducer from '../features/paste/pasteSlice'
 
 export const store = configureStore({
   reducer: {
-    paste: pasteReducer,
+    pasteSlice: pasteReducer,
   },
 })
