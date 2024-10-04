@@ -38,7 +38,7 @@ hours = hours % 12;
 hours = hours ? hours : 12;
 const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-const formattedTime = `${hours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+const formattedTime = `${hours}:${formattedMinutes} ${ampm}`;
 
 // function for handling pastes
 export function handlePaste(
