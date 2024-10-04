@@ -1,12 +1,14 @@
 import React from 'react'
 import Navbar from '../reusedComponents/Navbar'
+import PastesMain from './otherComponents/PastesMain'
 
-const Paste = () => {
+const Pastes = () => {
   return (
     <div className='h-screen bg-[#000000]'>
       <Navbar />
+      <PastesMain />
     </div>
   )
 }
 
-export default Paste
+export default Pastes
