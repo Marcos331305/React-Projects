@@ -7,10 +7,14 @@ const TextArea = ({ content, setContent, viewingPasteId }) => {
   const viewingPaste = useContext(pasteContext);
   const handleCopy = () => {
     if(content === ''){
-      toast('Nothing Copied 🙁');
+      toast('Nothing Copied 🙁',{
+        duration: 700
+      });
     } else {
-      navigator.clipboard.writeText(content);
-      toast.success('Content Copied Successfully');
+      navigator.clipboard.writeText(content || viewingPaste?.content);
+      toast.success('Content Copied Successfully',{
+        duration: 700
+      });
     }
   };
   return (

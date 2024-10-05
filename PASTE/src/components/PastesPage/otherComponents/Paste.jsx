@@ -20,15 +20,17 @@ const Paste = ({ pasteId, title, content, createdAt }) => {
     };
     const handleCopy = (content) => {
         navigator.clipboard.writeText(content);
-        toast.success('Copied Successfully');
+        toast.success('Copied Successfully',{
+            duration: 700
+        });
     };
     return (
         <div className='border border-[#4B5563] rounded-[5px] px-4 py-4'>
             {/* Wrapper */}
             <div className='flex flex-col lg:flex-row lg:justify-between gap-6'>
                 {/* Left Part */}
-                <div className='w-[90%] lg:w-[60%]'>
-                    <h2 className='text-4xl text-white'>{title}</h2>
+                <div className='w-[100%] lg:w-[60%]'>
+                    <h2 className='text-4xl text-white overflow-ellipsis overflow-hidden text-nowrap'>{title}</h2>
                     <div className='mt-4 mr-2'>
                         <p className='text-sm text-[#C5C4C4] line-clamp-3 lg:line-clamp-2'>{content}</p>
                     </div>

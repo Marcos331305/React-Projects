@@ -18,7 +18,9 @@ export const pasteSlice = createSlice({
       const newPasteContent = paste.content;
       // Check if the title or content is empty
       if (!newPasteTitle.trim() || !newPasteContent.trim()) {
-        toast("Title and content cannot be empty! 🙁");
+        toast("Title and content cannot be empty! 🙁",{
+          duration: 700
+        });
         return; // Exit the function to prevent storing the paste
       }
       const pastesArray = JSON.parse(localStorage.getItem("pastes")) || [];
@@ -30,16 +32,22 @@ export const pasteSlice = createSlice({
           pastesArray.map((paste) => [paste.title, paste])
         );
         if (pastesMap.has(newPasteTitle)) {
-          toast("Paste Already Exists 🙁");
+          toast("Paste Already Exists 🙁",{
+            duration: 700
+          });
         } else {
           state.pastes.push(paste);
           localStorage.setItem("pastes", JSON.stringify(state.pastes));
-          toast("Paste Created Successfully 🥳");
+          toast("Paste Created Successfully 🥳",{
+            duration: 700
+          });
         }
       } else {
         state.pastes.push(paste);
         localStorage.setItem("pastes", JSON.stringify(state.pastes));
-        toast("Paste Created Successfully 🥳");
+        toast("Paste Created Successfully 🥳",{
+          duration: 700
+        });
       }
     },
     removePaste: (state, action) => {
@@ -48,7 +56,9 @@ export const pasteSlice = createSlice({
       if(index >= 0){
         state.pastes.splice(index,1);
         localStorage.setItem('pastes',JSON.stringify(state.pastes));
-        toast.success('Paste Deleted');
+        toast.success('Paste Deleted',{
+          duration: 700
+        });
       }
     },
     updatePaste: (state, action) => {
@@ -57,13 +67,17 @@ export const pasteSlice = createSlice({
       if(index >= 0){
         state.pastes[index] = paste;
         localStorage.setItem('pastes',JSON.stringify(state.pastes));
-        toast.success('Pasted Updated');
+        toast.success('Pasted Updated',{
+          duration: 700
+        });
       }
     },
     resetAllPastes: (state, action) => {
       state.pastes = [];
       localStorage.removeItem('pastes');
-      toast.success('All Pastes Deleted');
+      toast.success('All Pastes Deleted',{
+        duration: 700
+      });
     },
   },
 });

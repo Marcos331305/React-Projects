@@ -70,7 +70,11 @@ const ShareLink = ({ open, onClose, sharingLink }) => {
             <DialogActions sx={{ marginBottom: '7px', mr: '5px' }}>
                 <Button variant="contained" sx={{ bgcolor: '#030712', border: '1px solid #1D283A' }} onClick={() => { 
                     navigator.clipboard.writeText(sharingLink)
-                    toast.success('Paste-Link Copied Successfully')
+                    toast.success('Paste-Link Copied Successfully',
+                        {
+                            duration: 700
+                        }
+                    )
                  }}>
                     Copy Link
                 </Button>
