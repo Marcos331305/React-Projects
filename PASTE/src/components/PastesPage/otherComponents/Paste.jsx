@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom'
 const Paste = ({ pasteId, title, content, createdAt }) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const dispatch = useDispatch();
-    const sharingLink = `http://localhost:5173/pastes/${pasteId}`;
+    const sharingLink = `https://paste-react-app.netlify.app/pastes/${pasteId}`;
     const handleDeletePaste = (pasteId) => {
         dispatch(removePaste(pasteId));
     };

@@ -37,7 +37,7 @@ const TextArea = ({ content, setContent, viewingPasteId }) => {
           </button>
         </div>
       </div>
-      <textarea disabled={viewingPasteId && true} value={viewingPaste?.content || content} onChange={(e) => setContent(e.target.value)} rows={25} placeholder='Write Your Content Here....' className='bg-[#0F0F0F] py-3 px-4 w-full md:w-[700px] outline-none text-white text-md rounded-md resize-none border-b border-l border-r border-[#4A4848]'></textarea>
+      <textarea disabled={viewingPasteId && true} value={viewingPaste?.content || content} onChange={(e) => setContent(e.target.value)} rows={25} placeholder='Write Your Content Here....' className='bg-[#0F0F0F] py-3 px-4 w-full md:w-[700px] outline-none text-white text-md rounded-bl-md rounded-br-md resize-none border-b border-l border-r border-[#4A4848]'></textarea>
     </div>
   )
 }
