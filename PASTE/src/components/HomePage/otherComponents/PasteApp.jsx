@@ -6,7 +6,7 @@ import { useState } from 'react'
 const PasteApp = ({viewingPasteId}) => {
   const [content,setContent] = useState('');
   return (
-    <div className={`flex flex-col items-center ${!viewingPasteId && 'mt-[64px]'} pb-[30px]`}>
+    <div className={`flex flex-col items-center ${(viewingPasteId || !viewingPasteId) && 'mt-[64px]'} pb-[30px]`}>
       <InputEnter content={content} setContent={setContent} viewingPasteId={viewingPasteId} />
       <TextArea content={content} setContent={setContent} viewingPasteId={viewingPasteId} />
     </div>
