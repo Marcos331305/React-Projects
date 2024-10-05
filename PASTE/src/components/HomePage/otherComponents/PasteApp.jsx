@@ -3,12 +3,12 @@ import InputEnter from './InputEnter'
 import TextArea from './TextArea'
 import { useState } from 'react'
 
-const PasteApp = () => {
+const PasteApp = ({viewingPasteId}) => {
   const [content,setContent] = useState('');
   return (
-    <div className='flex flex-col items-center'>
-      <InputEnter content={content} setContent={setContent} />
-      <TextArea content={content} setContent={setContent} />
+    <div className='flex flex-col items-center mt-[64px]'>
+      <InputEnter content={content} setContent={setContent} viewingPasteId={viewingPasteId} />
+      <TextArea content={content} setContent={setContent} viewingPasteId={viewingPasteId} />
     </div>
   )
 }

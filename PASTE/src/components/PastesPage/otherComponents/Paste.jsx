@@ -1,16 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import editIcon from '../../../assets/edit-icon.png'
 import deleteIcon from '../../../assets/delete-icon.png'
 import shareLinkIcon from '../../../assets/share-link-icon.png'
 import viewIcon from '../../../assets/view-icon.png'
 import copyIcon from '../../../assets/copy-icon.png'
 import dateIcon from '../../../assets/date-icon.png'
+import ShareLink from './ShareLink'
 import { useDispatch } from 'react-redux'
 import { removePaste } from '../../../features/paste/pasteSlice'
 import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 
-const Paste = ( { pasteId, title, content, createdAt } ) => {
+const Paste = ({ pasteId, title, content, createdAt }) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
     const dispatch = useDispatch();
+    const sharingLink = `http://localhost:5173/pastes/${pasteId}`;
     const handleDeletePaste = (pasteId) => {
         dispatch(removePaste(pasteId));
     };
@@ -34,16 +38,20 @@ const Paste = ( { pasteId, title, content, createdAt } ) => {
                     {/* Functionality Buttons */}
                     <div className='flex gap-2'>
                         <button className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
-                            <img src={editIcon} alt="Edit-Icon" />
+                            <Link to={`/?pasteId=${pasteId}`}>
+                                <img src={editIcon} alt="Edit-Icon" />
+                            </Link>
                         </button>
                         <button onClick={() => handleDeletePaste(pasteId)} className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
                             <img src={deleteIcon} alt="Delete-Icon" />
                         </button>
-                        <button className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
+                        <button onClick={() => setDialogOpen(true)} className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
                             <img src={shareLinkIcon} alt="ShareLink-Icon" />
                         </button>
                         <button className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
-                            <img src={viewIcon} alt="View-Icon" />
+                            <Link to={`/pastes/${pasteId}`}>
+                                <img src={viewIcon} alt="View-Icon" />
+                            </Link>
                         </button>
                         <button onClick={() => handleCopy(content)} className='py-2 px-2 border border-[#4B5563] rounded-[5px]'>
                             <img src={copyIcon} alt="Copy-Icon" />
@@ -58,6 +66,12 @@ const Paste = ( { pasteId, title, content, createdAt } ) => {
                             <p className='text-sm text-[#C5C4C4]'>{`${createdAt.date} at ${createdAt.time}`}</p>
                         </div>
                     </div>
+                    {/* Dialog Box */}
+                    <ShareLink
+                        open={dialogOpen}
+                        onClose={() => setDialogOpen(false)}
+                        sharingLink={sharingLink}
+                    />
                 </div>
             </div>
         </div>

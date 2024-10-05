@@ -11,7 +11,7 @@ const PastesMain = () => {
     (paste) => paste.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
   return (
-    <div className='mt-8 flex items-center flex-col gap-5'>
+    <div className='mt-[96px] flex items-center flex-col gap-5'>
         <div className='w-[90%] sm:w-[75%] md:w-[70%] lg:w-[60%] xl:w-[51%]'>
             <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder='Search question here...' className='bg-[#27272A] w-full py-2 px-4 outline-none text-white rounded-[5px]' />
         </div>
