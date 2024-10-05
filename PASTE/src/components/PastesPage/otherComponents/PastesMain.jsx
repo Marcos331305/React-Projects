@@ -18,10 +18,10 @@ const PastesMain = () => {
   return (
     <div className='mt-[96px] flex items-center flex-col gap-5 relative'>
       <div className='w-[95%] sm:w-[75%] md:w-[70%] lg:w-[60%] xl:w-[51%] relative'>
-        <input ref={inputRef} type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder='Search question here...' className='bg-[#27272A] w-full py-2 px-4 outline-none text-white rounded-[5px]' />
+        <input ref={inputRef} type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder='Search question here...' className='bg-[#27272A] w-full py-2 pl-4 pr-11 outline-none text-white rounded-[5px]' />
         {
           searchTerm !== '' && (
-            <button onClick={handleClear} className='absolute top-0 right-0 mr-3 h-full flex items-center'>
+            <button onClick={handleClear} className='absolute top-0 right-0 mr-[7px] h-full flex items-center'>
               <img src={clearIcon} alt="clear-Icon" />
             </button>
           )

@@ -6,15 +6,21 @@ import toast from 'react-hot-toast';
 const TextArea = ({ content, setContent, viewingPasteId }) => {
   const viewingPaste = useContext(pasteContext);
   const handleCopy = () => {
-    if(content === ''){
-      toast('Nothing Copied 🙁',{
-        duration: 700
-      });
+    if (content === '') {
+      if (viewingPasteId) {
+        const pasteContent = viewingPaste?.content || '';
+        if (pasteContent) {
+          navigator.clipboard.writeText(pasteContent);
+          toast.success('Content Copied Successfully', { duration: 700 });
+        } else {
+          toast('Nothing Copied 🙁', { duration: 700 });
+        }
+      } else {
+        toast('Nothing Copied 🙁', { duration: 700 });
+      }
     } else {
-      navigator.clipboard.writeText(content || viewingPaste?.content);
-      toast.success('Content Copied Successfully',{
-        duration: 700
-      });
+      navigator.clipboard.writeText(content);
+      toast.success('Content Copied Successfully', { duration: 700 });
     }
   };
   return (
