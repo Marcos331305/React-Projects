@@ -4,7 +4,7 @@ import PasteApp from './otherComponents/PasteApp'
 
 const Home = () => {
   return (
-    <div className='min-h-screen'>
+    <div>
      <Navbar />
      <PasteApp />
     </div>

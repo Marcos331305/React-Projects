@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
+import { json } from "react-router-dom";
 
 const initialState = {
   pastes: localStorage.getItem("pastes")
@@ -46,7 +47,7 @@ export const pasteSlice = createSlice({
       const index = state.pastes.findIndex((item) => item.id === paste.id);
       if(index >= 0){
         state.pastes.splice(index,1);
-        localStorage.setItem('pastes',state.pastes);
+        localStorage.setItem('pastes',JSON.stringify(state.pastes));
         toast.success('Paste Deleted');
       }
     },

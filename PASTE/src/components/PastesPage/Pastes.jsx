@@ -4,7 +4,7 @@ import PastesMain from './otherComponents/PastesMain'
 
 const Pastes = () => {
   return (
-    <div className='h-screen bg-[#000000]'>
+    <div className='pb-8 bg-[#000000]'>
       <Navbar />
       <PastesMain />
     </div>
