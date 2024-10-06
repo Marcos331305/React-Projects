@@ -88,8 +88,8 @@ const ShareLink = ({ open, onClose, sharingLink }) => {
                 </Box>
             </DialogContent>
             <DialogActions sx={{ marginBottom: '7px', mr: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                <Box display="flex" gap={1} sx={{
-                    ml: '8px'
+                <Box display="flex" sx={{
+                    ml: '7px'
                 }}>
                     <IconButton color="primary" onClick={handleShareWhatsapp}>
                         <WhatsAppIcon style={{ color: 'white' }} fontSize='large' />
