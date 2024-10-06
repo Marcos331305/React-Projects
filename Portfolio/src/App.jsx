@@ -1,10 +1,15 @@
+import { Box } from "@mui/material"
+import theme from "./app"
+import Navbar from "./components/Navbar"
 
 
 function App() {
   return (
-    <>
-    Hello Jee
-    </>
+    <Box sx={{
+      fontFamily: theme.typography.fontFamily
+    }}>
+      <Navbar />
+    </Box>
   )
 }
 
