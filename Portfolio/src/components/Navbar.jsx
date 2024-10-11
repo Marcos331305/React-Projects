@@ -25,19 +25,25 @@ const Navbar = () => {
         <Box sx={{
             py: '12px'
         }}>
-            <Container maxWidth={'xl'}>
-                <Grid2 container>
+            <Container  maxWidth={false} sx={{
+                maxWidth: '83vw'
+            }} >
+                <Grid2 container sx={{
+                    border: '2px slid white'
+                }}>
                     {/* Left part Logo */}
                     <Grid2 size={{ xs: 6, md: 4 }}>
-                        <Box>
-                            <img src={logo} height={'32px'} alt="" />
+                        <Box sx={{
+                            height: { xs: '35px', md: '52px' }
+                        }}>
+                            <img src={logo} height={'100%'} alt="" />
                         </Box>
                     </Grid2>
                     {
                         isMobile ? (
                             <>
                                 <Grid2 display={'flex'} justifyContent={'flex-end'} alignItems={'center'} size={6}>
-                                    <img height={'25'} onClick={toggleDrawer(true)} src={menuOpenIcon} alt="" />
+                                    <img height={'25px'} onClick={toggleDrawer(true)} src={menuOpenIcon} alt="" />
                                 </Grid2>
                                 {/* Creating menubar for mobile view */}
                                 <Drawer anchor='right' open={open} onClose={toggleDrawer(false)} data-testid="drawer">
@@ -47,28 +53,35 @@ const Navbar = () => {
                                         height: '100%'
                                     }} role="presentation" onClick={() => toggleDrawer(false)}>
                                         <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 2 }}>
-                                            <Typography variant="h6" sx={{ color: 'white' }}>
+                                            <Typography variant="h6" sx={{ color: 'white',fontSize: '32px',fontWeight: 500 }}>
                                                 Menu
                                             </Typography>
                                             <IconButton onClick={toggleDrawer(false)} sx={{ color: 'white' }}>
                                                 <CloseIcon fontSize='large' />
                                             </IconButton>
                                         </Box>
-                                        <List>
+                                        <List sx={{
+                                            pl:'15px'
+                                        }}>
                                             {['Home', 'About', 'Skills', 'Services', 'Portfolio', 'Contact'].map((link) => (
-                                                <Box key={link} display={'flex'} justifyContent={'flex-start'} alignItems={'center'}>
+                                                <Box key={link} display={'flex'} gap={'20px'} justifyContent={'flex-start'} alignItems={'center'}>
                                                     <ListItem sx={{
-                                                        width: '80px'
+                                                        width: '100px',
                                                     }} onClick={() => handleClickLink(link)}>
-                                                        <ListItemText primary={link} sx={{ 
-                                                            color: 'white',
-                                                            fontSize: '50px',
-                                                            fontFamily: theme.typography.fontFamily,
-                                                         }} />
+                                                        <ListItemText primary={link} primaryTypographyProps={{
+                                                            sx: {
+                                                                color: 'white',
+                                                                fontSize: '22px',
+                                                                fontFamily: theme.typography.fontFamily,
+                                                                fontWeight: '500'
+                                                            }
+                                                        }} />
                                                     </ListItem>
                                                     {
                                                         activeLink === link && (
-                                                            <img height={'12px'} src={navUnderline} alt="Underline-Svg" />
+                                                            <Box>
+                                                                <img height={'12px'} src={navUnderline} alt="Underline-Svg" />
+                                                            </Box>
                                                         )
                                                     }
                                                 </Box>
