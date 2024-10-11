@@ -26,7 +26,7 @@ const Navbar = () => {
             py: '12px'
         }}>
             <Container  maxWidth={false} sx={{
-                maxWidth: '83vw'
+                maxWidth: {lg:'lg',xl: '83vw'}
             }} >
                 <Grid2 container sx={{
                     border: '2px slid white'
@@ -61,7 +61,7 @@ const Navbar = () => {
                                             </IconButton>
                                         </Box>
                                         <List sx={{
-                                            pl:'15px'
+                                            pl:'10px'
                                         }}>
                                             {['Home', 'About', 'Skills', 'Services', 'Portfolio', 'Contact'].map((link) => (
                                                 <Box key={link} display={'flex'} gap={'20px'} justifyContent={'flex-start'} alignItems={'center'}>
@@ -121,14 +121,17 @@ const Navbar = () => {
                                 {/* Right part connectButton */}
                                 <Grid2 display={'flex'} justifyContent={'flex-end'} alignItems={'center'} size={4}>
                                     <Button sx={{
-                                        bgcolor: '#C9518D',
+                                        background: 'linear-gradient(264deg, #DF8908 -5.09%, #B415FF 106.28%)',
                                         fontFamily: theme.typography.fontFamily,
                                         fontSize: '16px',
                                         fontWeight: 700,
                                         textTransform: 'capitalize',
                                         py: '10px',
                                         px: '25px',
-                                        borderRadius: '50px'
+                                        borderRadius: '50px',
+                                        ":hover":{
+                                            border: '1px solid white'
+                                        }
                                     }} variant="contained">connect with me</Button>
                                 </Grid2>
                             </>
