@@ -6,7 +6,6 @@ import menuOpenIcon from '../assets/menu_open.svg'
 import navUnderline from '../assets/nav_underline.svg'
 import { Drawer, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import logo from '../assets/logo.png'
 
 const Navbar = () => {
     const [activeLink, setActiveLink] = useState('Home');
@@ -34,9 +33,16 @@ const Navbar = () => {
                     {/* Left part Logo */}
                     <Grid2 size={{ xs: 6, md: 4 }}>
                         <Box sx={{
-                            height: { xs: '35px', md: '52px' }
+                            height: { xs: '35px', md: '52px' },
+                            display: 'flex',
+                            alignItems: 'center'
                         }}>
-                            <img src={logo} height={'100%'} alt="" />
+                            <Typography sx={{
+                                color: 'white',
+                                fontSize: '50px',
+                                fontFamily: theme.typography.logoFont.fontFamily,
+                                fontWeight: 700
+                            }}>Ravi</Typography>
                         </Box>
                     </Grid2>
                     {

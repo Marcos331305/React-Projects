@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Container, Typography, Button, Grid2, Avatar } from '@mui/material'
 import myImg from '../assets/myImg.jpeg'
-import { motion } from 'framer-motion';
 
 const typewriterVariants = {
     hidden: { width: 0, opacity: 0 },
