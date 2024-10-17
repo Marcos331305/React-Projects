@@ -22,7 +22,7 @@ const Navbar = () => {
 
     return (
         <Box sx={{
-            py: '12px'
+            py: '20px'
         }}>
             <Container  maxWidth={false} sx={{
                 maxWidth: {lg:'lg',xl: '83vw'}

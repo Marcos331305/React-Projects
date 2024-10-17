@@ -2,6 +2,7 @@ import { Box } from "@mui/material"
 import theme from "./app"
 import Navbar from "./components/Navbar"
 import HeroSection from "./components/HeroSection"
+import AboutMe from "./components/AboutMe"
 
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
     }}>
       <Navbar />
       <HeroSection />
+      <AboutMe />
     </Box>
   )
 }
