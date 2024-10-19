@@ -8,12 +8,18 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import Login from './components/Login.jsx'
+import SignUp from './components/SignUp.jsx'
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div>Hello world!</div>,
+    element: <Login />,
   },
+  {
+    path: "/signUp",
+    element: <SignUp />
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(
