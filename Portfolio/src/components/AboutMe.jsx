@@ -7,7 +7,6 @@ import myImg from '../assets/myImg.jpeg'
 const AboutMe = () => {
     return (
         <Box sx={{
-            height: '100vh',
             mt: { xs: '80px', lg: '105px' },
         }}>
             {/* About me Heading */}
