@@ -30,6 +30,7 @@ const isEmail = (email) =>
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -102,8 +103,8 @@ export default function Login() {
     // writing my dispatch for userLogin
     dispatch(handleLogin({emailInput,passwordInput}));
 
-    //Show Successfull Submittion
-    setSuccess("Form Submitted Successfully");
+    //Show Successfull message to user if login attempted successFully Submittion
+    // setSuccess("Form Submitted Successfully");
   };
 
   const handleSignupClick = () => {
@@ -195,6 +196,13 @@ export default function Login() {
           <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
             <Alert severity="error" size="small">
               {formValid}
+            </Alert>
+          </Stack>
+        )}
+        {authState.error && (
+          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {authState.error}
             </Alert>
           </Stack>
         )}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { signupUser, loginUser } from '../features/authSlice'
+import { handleSignup } from '../features/authSlice'
 
 // Material UI Imports
 import {
@@ -32,6 +32,7 @@ const isEmail = (email) =>
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const authState = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = React.useState(false);
 
   //Inputs
@@ -121,10 +122,10 @@ export default function Login() {
     setFormValid(null);
 
     // Writing my logic for signUp
-    dispatch(signupUser({usernameInput,emailInput,passwordInput,rememberMe}));
+    dispatch(handleSignup({ usernameInput, emailInput, passwordInput, rememberMe }));
 
     //Show Successfull Submittion
-    setSuccess("Form Submitted Successfully");
+    // setSuccess("Form Submitted Successfully");
   };
 
   const handleLoginClick = () => {
@@ -234,6 +235,13 @@ export default function Login() {
             </Alert>
           </Stack>
         )}
+        {authState.error && (
+          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {authState.error}
+            </Alert>
+          </Stack>
+        )}
 
         {/* Show Success if no issues */}
         {success && (
@@ -245,9 +253,9 @@ export default function Login() {
         )}
 
         <div style={{ marginTop: "16px", fontSize: "10px" }} margin="left">
-          <a style={{fontSize: '15px'}}>Forgot Password</a>
+          <a style={{ fontSize: '15px' }}>Forgot Password</a>
           <br />
-          <p style={{fontSize: '15px', display: 'inline'}}>Do you have an account ?{" "}</p>
+          <p style={{ fontSize: '15px', display: 'inline' }}>Do you have an account ?{" "}</p>
           <small onClick={handleLoginClick} style={{ textDecoration: "underline", color: "blue", fontSize: '13px', cursor: 'pointer' }}>
             Login
           </small>
