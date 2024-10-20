@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux'
+import { signupUser, loginUser } from '../features/authSlice'
 
 // Material UI Imports
 import {
@@ -28,13 +30,14 @@ const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
 export default function Login() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
 
   //Inputs
-  const [usernameInput, setUsernameInput] = useState();
-  const [emailInput, setEmailInput] = useState();
-  const [passwordInput, setPasswordInput] = useState();
+  const [usernameInput, setUsernameInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
 
   // Inputs Errors
@@ -67,7 +70,6 @@ export default function Login() {
 
   // Validation for onBlur Email
   const handleEmail = () => {
-    console.log(isEmail(emailInput));
     if (!isEmail(emailInput)) {
       setEmailError(true);
       return;
@@ -118,10 +120,8 @@ export default function Login() {
     }
     setFormValid(null);
 
-    // Proceed to use the information passed
-    console.log("Username : " + usernameInput);
-    console.log("Email : " + emailInput);
-    console.log("Password : " + passwordInput);
+    // Writing my logic for signUp
+    dispatch(signupUser({usernameInput,emailInput,passwordInput,rememberMe}));
 
     //Show Successfull Submittion
     setSuccess("Form Submitted Successfully");

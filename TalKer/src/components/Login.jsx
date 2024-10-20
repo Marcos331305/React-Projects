@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from 'react-redux'
+import { signupUser, loginUser, handleLogin } from '../features/authSlice'
 
 // Material UI Imports
 import {
@@ -27,6 +29,8 @@ const isEmail = (email) =>
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = useState(false);
 
   //Inputs
@@ -95,10 +99,8 @@ export default function Login() {
     }
     setFormValid(null);
 
-    // Proceed to use the information passed
-    console.log("Email : " + emailInput);
-    console.log("Password : " + passwordInput);
-    console.log("Remember : " + rememberMe);
+    // writing my dispatch for userLogin
+    dispatch(handleLogin({emailInput,passwordInput}));
 
     //Show Successfull Submittion
     setSuccess("Form Submitted Successfully");

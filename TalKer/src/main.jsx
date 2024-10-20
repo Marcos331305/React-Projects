@@ -4,27 +4,9 @@ import App from './App.jsx'
 import CssBaseline from '@mui/material/CssBaseline'
 import { store } from './redux/store.js'
 import { Provider } from 'react-redux'
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import Login from './components/Login.jsx'
-import SignUp from './components/SignUp.jsx'
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Login />,
-  },
-  {
-    path: "/signUp",
-    element: <SignUp />
-  }
-]);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
     <Provider store={store}>
       <CssBaseline />
       <App />
