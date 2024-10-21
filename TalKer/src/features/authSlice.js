@@ -1,7 +1,6 @@
-import { buildCreateSlice, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { supabase } from "../scripts/supabaseClient";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { useDebugValue } from "react";
 
 const initialState = {
   user: {
@@ -12,6 +11,7 @@ const initialState = {
   // loading: false,
   error: null,
   isAuthenticated: false,
+  successfullAuthMsg: null
 };
 
 export const handleLogin = createAsyncThunk(
@@ -64,12 +64,6 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    signupUser: async (state, action) => {
-      console.log("hey");
-    },
-    loginUser: (state) => {
-      console.log("loginProcessStarted");
-    },
     incrementByAmount: (state, action) => {
       state.value += action.payload;
     },
@@ -79,9 +73,11 @@ export const authSlice = createSlice({
       // Handle Login Actions
       .addCase(handleLogin.pending, (state) => {
         state.error = null; // Clear previous errors
+        state.successfullAuthMsg = null; // Clear previous messages
       })
       .addCase(handleLogin.fulfilled, (state, action) => {
-        console.log("login successfully >>>");
+        state.isAuthenticated = true;
+
         // You can also set state with user data or session if needed
         // state.user = action.payload.user; // Example
       })

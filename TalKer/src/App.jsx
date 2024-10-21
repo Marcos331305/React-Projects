@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -20,26 +19,22 @@ const router = createBrowserRouter([
     element: <SignUp />
   },
   {
-    path: "/", // Parent route for protected routes
-    element: <ProtectedRoute isAuthenticated={isAuthenticated} />, // Protected route wrapper
-    children: [
-      {
-        path: "chatUi",
-        element: <ChatUi />, // Nested protected route
-      },
-    ],
-  },
+    path: "/chatUi",
+    element: <ChatUi />
+  }
+  // {
+  //   path: "/", // Parent route for protected routes
+  //   element: <ProtectedRoute isAuthenticated={isAuthenticated} />, // Protected route wrapper
+  //   children: [
+  //     {
+  //       path: "chatUi",
+  //       element: <ChatUi />, // Nested protected route
+  //     },
+  //   ],
+  // },
 ]);
 
 function App() {
-  // useEffect(() => {
-  //   first
-  
-  //   return () => {
-  //     second
-  //   }
-  // }, [third])
-  
   return (
     <>
       <RouterProvider router={router} />

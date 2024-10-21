@@ -208,7 +208,7 @@ export default function Login() {
         </div>
 
         <div style={{ fontSize: "15px", display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-          <Checkbox
+          <Checkbox id="remember-me-checkbox-login"
             {...label}
             size="medium"
             onChange={(event) => setRememberMe(event.target.checked)}

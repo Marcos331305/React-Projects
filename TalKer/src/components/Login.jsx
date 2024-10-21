@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { signupUser, loginUser, handleLogin } from '../features/authSlice'
 
@@ -22,15 +22,50 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LoginIcon from "@mui/icons-material/Login";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../scripts/supabaseClient";
 
 // Email Validation
 const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
+// getting userSession
+const getUserSession = async () => {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  if (error) {
+    return null; // Return null if there's an error
+  }
+  return session; // Return the session if successful
+};
+
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
+
+  // CountDown for my finalAuth
+  const [countDown, setCountDown] = useState(3); // Start countdown at 3
+
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      const timer = setInterval(() => {
+        setCountDown((prev) => {
+          if (prev > 0) {
+            return prev - 1; // Decrease countdown
+          } else {
+            clearInterval(timer); // Clear the timer when reaching 0
+            if(getUserSession()){
+              navigate('/chatUi')
+            }
+            return 0; // Ensure it returns 0 at the end
+          }
+        });
+      }, 1000);
+
+      // Clean up interval when countdown reaches 0 or when component unmounts
+      return () => clearInterval(timer);
+    }
+  }, [authState.isAuthenticated]);
+
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -82,7 +117,6 @@ export default function Login() {
 
   //handle Submittion
   const handleSubmit = () => {
-    setSuccess(null);
     //First of all Check for Errors
 
     // If Email error is true
@@ -101,10 +135,7 @@ export default function Login() {
     setFormValid(null);
 
     // writing my dispatch for userLogin
-    dispatch(handleLogin({emailInput,passwordInput}));
-
-    //Show Successfull message to user if login attempted successFully Submittion
-    // setSuccess("Form Submitted Successfully");
+    dispatch(handleLogin({ emailInput, passwordInput }));
   };
 
   const handleSignupClick = () => {
@@ -207,11 +238,15 @@ export default function Login() {
           </Stack>
         )}
 
-        {/* Show Success if no issues */}
-        {success && (
+        {/* Show final logging in message with countdown if no issues with login process */}
+        {authState.isAuthenticated && (
           <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
             <Alert severity="success" size="small">
-              {success}
+              {`Logging in, Please wait for `}
+              <span style={{ fontWeight: 'bold', color: 'red' }}>
+                {countDown}
+              </span>
+              {` seconds ...`}
             </Alert>
           </Stack>
         )}
