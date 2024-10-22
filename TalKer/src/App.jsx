@@ -5,9 +5,7 @@ import {
 import Login from './components/Login.jsx'
 import SignUp from './components/SignUp.jsx'
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import ChatUi from "./components/ChatUi.jsx";
-
-let isAuthenticated;
+import TalkerUi from "./components/TalkerUi.jsx";
 
 const router = createBrowserRouter([
   {
@@ -19,19 +17,13 @@ const router = createBrowserRouter([
     element: <SignUp />
   },
   {
-    path: "/chatUi",
-    element: <ChatUi />
-  }
-  // {
-  //   path: "/", // Parent route for protected routes
-  //   element: <ProtectedRoute isAuthenticated={isAuthenticated} />, // Protected route wrapper
-  //   children: [
-  //     {
-  //       path: "chatUi",
-  //       element: <ChatUi />, // Nested protected route
-  //     },
-  //   ],
-  // },
+    path: "/talker",
+    element: (
+      <ProtectedRoute>
+        <TalkerUi /> // Protected Route for TalkerUi component
+      </ProtectedRoute>
+    )
+  },
 ]);
 
 function App() {

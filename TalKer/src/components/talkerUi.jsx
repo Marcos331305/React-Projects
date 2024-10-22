@@ -1,11 +1,12 @@
 import React from 'react'
+import { supabase } from '../scripts/supabaseClient'
 
-const talkerUi = () => {
+const TalkerUi = () => {
   return (
     <div>
-        Welcome to talker AI
+        Hello welcome to talker an AI assitant from Ravikant Jangir
     </div>
   )
 }
 
-export default talkerUi
+export default TalkerUi

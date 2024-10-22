@@ -30,12 +30,10 @@ const isEmail = (email) =>
 
 // getting userSession
 const getUserSession = async () => {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error) {
-    return null; // Return null if there's an error
-  }
-  return session; // Return the session if successful
+  const sesison = await supabase.auth.getSession();
+  console.log(sesison);
 };
+getUserSession()
 
 export default function Login() {
   const navigate = useNavigate();
@@ -53,9 +51,7 @@ export default function Login() {
             return prev - 1; // Decrease countdown
           } else {
             clearInterval(timer); // Clear the timer when reaching 0
-            if(getUserSession()){
-              navigate('/chatUi')
-            }
+            navigate('/talker');
             return 0; // Ensure it returns 0 at the end
           }
         });
