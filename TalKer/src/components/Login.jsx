@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { signupUser, loginUser, handleLogin } from '../features/authSlice'
+import { handleLogin, setAuthState } from '../features/authSlice'
 
 // Material UI Imports
 import {
@@ -22,27 +22,18 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LoginIcon from "@mui/icons-material/Login";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../scripts/supabaseClient";
 
 // Email Validation
 const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
-
-// getting userSession
-const getUserSession = async () => {
-  const sesison = await supabase.auth.getSession();
-  console.log(sesison);
-};
-getUserSession()
 
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
 
-  // CountDown for my finalAuth
+  // CountDown and navigation login for my finalAuth
   const [countDown, setCountDown] = useState(3); // Start countdown at 3
-
   useEffect(() => {
     if (authState.isAuthenticated) {
       const timer = setInterval(() => {
@@ -50,19 +41,23 @@ export default function Login() {
           if (prev > 0) {
             return prev - 1; // Decrease countdown
           } else {
-            clearInterval(timer); // Clear the timer when reaching 0
-            navigate('/talker');
-            return 0; // Ensure it returns 0 at the end
+            clearInterval(timer); // Clear the interval
+            return 0; // Return 0 at the end of countdown
           }
         });
       }, 1000);
-
-      // Clean up interval when countdown reaches 0 or when component unmounts
+  
+      // Check when the countdown hits 0 and then navigate
+      if (countDown === 0) {
+        dispatch(setAuthState());
+        navigate('/talker');
+      }
+  
+      // Clean up the interval when component unmounts or authState changes
       return () => clearInterval(timer);
     }
-  }, [authState.isAuthenticated]);
-
-
+  }, [authState.isAuthenticated, countDown, navigate]);
+  
   const [showPassword, setShowPassword] = useState(false);
 
   //Inputs

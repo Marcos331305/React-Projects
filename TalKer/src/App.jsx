@@ -18,9 +18,9 @@ const router = createBrowserRouter([
   },
   {
     path: "/talker",
-    element: (
+    element: ( // Protection for this component using ProtectedRouted component
       <ProtectedRoute>
-        <TalkerUi /> // Protected Route for TalkerUi component
+        <TalkerUi />
       </ProtectedRoute>
     )
   },

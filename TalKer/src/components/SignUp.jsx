@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleSignup } from '../features/authSlice'
+import { handleSignup,setAuthState } from '../features/authSlice'
 
 // Material UI Imports
 import {
@@ -58,6 +58,32 @@ export default function Login() {
 
   // Label for Checkbox
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
+
+  // CountDown and navigation login for my finalAuth
+  const [countDown, setCountDown] = useState(3); // Start countdown at 3
+  useEffect(() => {
+    if (authState.isAuthenticated) {
+      const timer = setInterval(() => {
+        setCountDown((prev) => {
+          if (prev > 0) {
+            return prev - 1; // Decrease countdown
+          } else {
+            clearInterval(timer); // Clear the interval
+            return 0; // Return 0 at the end of countdown
+          }
+        });
+      }, 1000);
+
+      // Check when the countdown hits 0 and then navigate
+      if (countDown === 0) {
+        dispatch(setAuthState());
+        navigate('/talker');
+      }
+
+      // Clean up the interval when component unmounts or authState changes
+      return () => clearInterval(timer);
+    }
+  }, [authState.isAuthenticated, countDown, navigate]);
 
   // Validation for onBlur Username
   const handleUsername = () => {
@@ -123,9 +149,6 @@ export default function Login() {
 
     // Writing my logic for signUp
     dispatch(handleSignup({ usernameInput, emailInput, passwordInput, rememberMe }));
-
-    //Show Successfull Submittion
-    // setSuccess("Form Submitted Successfully");
   };
 
   const handleLoginClick = () => {
@@ -243,18 +266,20 @@ export default function Login() {
           </Stack>
         )}
 
-        {/* Show Success if no issues */}
-        {success && (
+        {/* Show final logging in message with countdown if no issues with login process */}
+        {authState.isAuthenticated && (
           <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
             <Alert severity="success" size="small">
-              {success}
+              {`Signing in, Please wait for `}
+              <span style={{ fontWeight: 'bold', color: 'red' }}>
+                {countDown}
+              </span>
+              {` seconds ...`}
             </Alert>
           </Stack>
         )}
 
-        <div style={{ marginTop: "16px", fontSize: "10px" }} margin="left">
-          <a style={{ fontSize: '15px' }}>Forgot Password</a>
-          <br />
+        <div style={{ fontSize: "10px", marginTop: "16px" }} margin="left">
           <p style={{ fontSize: '15px', display: 'inline' }}>Do you have an account ?{" "}</p>
           <small onClick={handleLoginClick} style={{ textDecoration: "underline", color: "blue", fontSize: '13px', cursor: 'pointer' }}>
             Login

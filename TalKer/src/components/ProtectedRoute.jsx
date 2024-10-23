@@ -13,6 +13,11 @@ const ProtectedRoute = ({ children }) => {
     checkAuth();
   }, [])
 
+  // Show loading while authentication is being checked
+  if (isAuth === null) {
+    return <div>Loading...</div>; // You can replace this with a spinner or your preferred loading UI
+  }
+
   return isAuth ? children : <Navigate to="/" replace />;
 };
 

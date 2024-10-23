@@ -42,6 +42,7 @@ export const handleSignup = createAsyncThunk(
   async ({ usernameInput, emailInput, passwordInput, rememberMe }) => {
     // handling userSignup with supabase
     try {
+      console.log('trying to signing user')
       const { user, session, error } = await supabase.auth.signUp({
         email: emailInput, // Corrected key here
         password: passwordInput, // Corrected key here
@@ -64,8 +65,11 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    incrementByAmount: (state, action) => {
+    general: (state, action) => {
       state.value += action.payload;
+    },
+    setAuthState: (state) => {
+      state.isAuthenticated = false;
     },
   },
   extraReducers: (builder) => {
@@ -75,34 +79,33 @@ export const authSlice = createSlice({
         state.error = null; // Clear previous errors
         state.successfullAuthMsg = null; // Clear previous messages
       })
-      .addCase(handleLogin.fulfilled, (state, action) => {
+      .addCase(handleLogin.fulfilled, (state) => {
         state.isAuthenticated = true;
-
         // You can also set state with user data or session if needed
         // state.user = action.payload.user; // Example
       })
       .addCase(handleLogin.rejected, (state, action) => {
         state.error = action.error.message; // Capture error message
-        console.log("Login failed:", state.error); // Log error
       })
 
       // Handle Signup Actions
       .addCase(handleSignup.pending, (state) => {
         state.error = null; // Clear previous errors
+        state.successfullAuthMsg = null; // Clear previous messages
       })
       .addCase(handleSignup.fulfilled, (state, action) => {
-        console.log("SignUp successfully >>>");
+        state.isAuthenticated = true;
+        console.log('SigneduP Successfully --->')
         // You can also set state with user data or session if needed
         // state.user = action.payload.user; // Example
       })
       .addCase(handleSignup.rejected, (state, action) => {
         state.error = action.error.message; // Capture error message
-        console.log("Signup failed:", state.error); // Log error
       });
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { signupUser, loginUser, incrementByAmount } = authSlice.actions;
+export const { setAuthState, incrementByAmount } = authSlice.actions;
 
 export default authSlice.reducer;
