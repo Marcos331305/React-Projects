@@ -59,32 +59,6 @@ export default function Login() {
   // Label for Checkbox
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
-  // CountDown and navigation login for my finalAuth
-  const [countDown, setCountDown] = useState(3); // Start countdown at 3
-  useEffect(() => {
-    if (authState.isAuthenticated) {
-      const timer = setInterval(() => {
-        setCountDown((prev) => {
-          if (prev > 0) {
-            return prev - 1; // Decrease countdown
-          } else {
-            clearInterval(timer); // Clear the interval
-            return 0; // Return 0 at the end of countdown
-          }
-        });
-      }, 1000);
-
-      // Check when the countdown hits 0 and then navigate
-      if (countDown === 0) {
-        dispatch(setAuthState());
-        navigate('/talker');
-      }
-
-      // Clean up the interval when component unmounts or authState changes
-      return () => clearInterval(timer);
-    }
-  }, [authState.isAuthenticated, countDown, navigate]);
-
   // Validation for onBlur Username
   const handleUsername = () => {
     if (!usernameInput) {
@@ -266,15 +240,11 @@ export default function Login() {
           </Stack>
         )}
 
-        {/* Show final logging in message with countdown if no issues with login process */}
+        {/* Show final msg for email confirmation */}
         {authState.isAuthenticated && (
           <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
             <Alert severity="success" size="small">
-              {`Signing in, Please wait for `}
-              <span style={{ fontWeight: 'bold', color: 'red' }}>
-                {countDown}
-              </span>
-              {` seconds ...`}
+              Verfication and Login - Links sent at your Email.
             </Alert>
           </Stack>
         )}

@@ -37,29 +37,55 @@ export const handleLogin = createAsyncThunk(
   }
 );
 
+// export const handleSignup = createAsyncThunk(
+//   "auth/handleSignup",
+//   async ({ usernameInput, emailInput, passwordInput, rememberMe }) => {
+//     // handling userSignup with supabase
+//     try {
+//       const { user, session, error } = await supabase.auth.signUp({
+//         email: emailInput, // Corrected key here
+//         password: passwordInput, // Corrected key here
+//       });
+//       console.log("Supabase signup response:", { data, error });
+
+//       if (error) {
+//         throw new Error(error.message); // Throw error to be caught in the rejected case
+//       }
+
+//       // Return user data or session if successful
+//       return { user, session }; // This will be passed to the fulfilled case
+//     } catch (error) {
+//       console.log(`Signup Failed!, Because = ${error.message}`);
+//       throw error; // Rethrow the error to be caught in the rejected case
+//     }
+//   }
+// );
 export const handleSignup = createAsyncThunk(
   "auth/handleSignup",
-  async ({ usernameInput, emailInput, passwordInput, rememberMe }) => {
-    // handling userSignup with supabase
+  async ({ emailInput, passwordInput }, { rejectWithValue }) => {
     try {
-      console.log('trying to signing user')
+      // Attempt to sign up the user
       const { user, session, error } = await supabase.auth.signUp({
-        email: emailInput, // Corrected key here
-        password: passwordInput, // Corrected key here
+        email: emailInput,
+        password: passwordInput,
       });
 
+      // Check for errors, including duplicate email
       if (error) {
-        throw new Error(error.message); // Throw error to be caught in the rejected case
+        if (error.message.includes("User already registered")) {
+          return rejectWithValue("This email is already registered. Please log in.");
+        }
+        throw new Error(error.message);
       }
 
-      // Return user data or session if successful
-      return { user, session }; // This will be passed to the fulfilled case
+      return { user, session }; // Successful signup
     } catch (error) {
-      console.log(`Signup Failed!, Because = ${error.message}`);
-      throw error; // Rethrow the error to be caught in the rejected case
+      console.log(`Signup Failed! Reason: ${error.message}`);
+      return rejectWithValue(error.message);
     }
   }
 );
+
 
 export const authSlice = createSlice({
   name: "auth",
@@ -95,7 +121,6 @@ export const authSlice = createSlice({
       })
       .addCase(handleSignup.fulfilled, (state, action) => {
         state.isAuthenticated = true;
-        console.log('SigneduP Successfully --->')
         // You can also set state with user data or session if needed
         // state.user = action.payload.user; // Example
       })
