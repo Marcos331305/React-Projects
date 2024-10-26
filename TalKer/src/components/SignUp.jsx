@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleSignup,setAuthState } from '../features/authSlice'
+import { handleSignup, setAuthState } from '../features/authSlice'
+import Loading from "./Loading.jsx";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+const auth = getAuth();
 
 // Material UI Imports
 import {
@@ -30,9 +33,16 @@ const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
 export default function Login() {
+  useEffect(() => {
+    auth.onAuthStateChanged((userCred)=>{
+      console.log(userCred)
+    });
+  }, [])
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authState = useSelector((state) => state.auth);
+  const loading = authState.loading;
   const [showPassword, setShowPassword] = React.useState(false);
 
   //Inputs
@@ -123,6 +133,12 @@ export default function Login() {
 
     // Writing my logic for signUp
     dispatch(handleSignup({ usernameInput, emailInput, passwordInput, rememberMe }));
+
+    if(authState.isAuthenticated){
+      setUsernameInput('');
+      setEmailInput('');
+      setPasswordInput('');
+    }
   };
 
   const handleLoginClick = () => {
@@ -136,9 +152,14 @@ export default function Login() {
       justifyContent: 'center',
       alignItems: 'center'
     }}>
+      {/* LoadingView */}
+      <Loading loading={loading} message={'Registering, please wait...'} />
       <Box sx={{
         padding: 1,
         width: '350px',
+        p: 2,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.15), 0px 2px 4px rgba(0, 0, 0, 0.1)',
+        borderRadius: '7px'
       }}>
         <div style={{ marginTop: "10px" }}>
           <TextField
@@ -204,23 +225,14 @@ export default function Login() {
           </FormControl>
         </div>
 
-        <div style={{ fontSize: "15px", display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-          <Checkbox id="remember-me-checkbox-login"
-            {...label}
-            size="medium"
-            onChange={(event) => setRememberMe(event.target.checked)}
-          />
-          Remember Me
-        </div>
-
-        <div style={{ marginTop: "10px" }}>
+        <div style={{ marginTop: "40px" }}>
           <Button
             variant="contained"
             fullWidth
             startIcon={<LoginIcon />}
             onClick={handleSubmit}
           >
-            Sign Up
+            Register
           </Button>
         </div>
 
@@ -239,16 +251,6 @@ export default function Login() {
             </Alert>
           </Stack>
         )}
-
-        {/* Show final msg for email confirmation */}
-        {authState.isAuthenticated && (
-          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
-            <Alert severity="success" size="small">
-              Verfication and Login - Links sent at your Email.
-            </Alert>
-          </Stack>
-        )}
-
         <div style={{ fontSize: "10px", marginTop: "16px" }} margin="left">
           <p style={{ fontSize: '15px', display: 'inline' }}>Do you have an account ?{" "}</p>
           <small onClick={handleLoginClick} style={{ textDecoration: "underline", color: "blue", fontSize: '13px', cursor: 'pointer' }}>

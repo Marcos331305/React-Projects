@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { handleLogin, setAuthState } from '../features/authSlice'
+import Loading from "./Loading";
 
 // Material UI Imports
 import {
@@ -31,32 +32,14 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
+  const loading = authState.loading;
 
-  // CountDown and navigation login for my finalAuth
-  const [countDown, setCountDown] = useState(3); // Start countdown at 3
+  // Navigate the user to their appropriate ui after login
   useEffect(() => {
     if (authState.isAuthenticated) {
-      const timer = setInterval(() => {
-        setCountDown((prev) => {
-          if (prev > 0) {
-            return prev - 1; // Decrease countdown
-          } else {
-            clearInterval(timer); // Clear the interval
-            return 0; // Return 0 at the end of countdown
-          }
-        });
-      }, 1000);
-
-      // Check when the countdown hits 0 and then navigate
-      if (countDown === 0) {
-        dispatch(setAuthState());
-        navigate('/talker');
-      }
-
-      // Clean up the interval when component unmounts or authState changes
-      return () => clearInterval(timer);
+      navigate('/talker', { replace: true });
     }
-  }, [authState.isAuthenticated, countDown, navigate]);
+  }, [authState.isAuthenticated,navigate]);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -126,7 +109,7 @@ export default function Login() {
     setFormValid(null);
 
     // writing my dispatch for userLogin
-    dispatch(handleLogin({ emailInput, passwordInput }));
+    dispatch(handleLogin({ emailInput, passwordInput, rememberMe }));
   };
 
   const handleSignupClick = () => {
@@ -143,36 +126,12 @@ export default function Login() {
       <Box sx={{
         padding: 1,
         width: '350px',
+        p: 2,
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.15), 0px 2px 4px rgba(0, 0, 0, 0.1)',
+        borderRadius: '7px'
       }}>
-        {/* Show Form Error if any */}
-        {formValid && (
-          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
-            <Alert severity="error" size="small">
-              {formValid}
-            </Alert>
-          </Stack>
-        )}
-        {authState.error && (
-          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
-            <Alert severity="error" size="small">
-              {authState.error}
-            </Alert>
-          </Stack>
-        )}
-
-        {/* Show final logging in message with countdown if no issues with login process */}
-        {authState.isAuthenticated && (
-          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
-            <Alert severity="success" size="small">
-              {`Logging in, Please wait for `}
-              <span style={{ fontWeight: 'bold', color: 'red' }}>
-                {countDown}
-              </span>
-              {` seconds ...`}
-            </Alert>
-          </Stack>
-        )}
-
+        {/* LoadingView */}
+        <Loading loading={loading} message={'Logging in, please wait...'} />
         <div>
           <TextField
             label="Email Address"
@@ -242,12 +201,28 @@ export default function Login() {
           </Button>
         </div>
 
+        {/* Show Form Error if any */}
+        {formValid && (
+          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {formValid}
+            </Alert>
+          </Stack>
+        )}
+        {authState.error && (
+          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {authState.error}
+            </Alert>
+          </Stack>
+        )}
+
         <div style={{ marginTop: "16px", fontSize: "10px" }} margin="left">
           <a style={{ fontSize: '15px' }}>Forgot Password</a>
           <br />
           <p style={{ display: 'inline', fontSize: '15px' }}>Don't have an account ?{" "}</p>
           <small onClick={handleSignupClick} style={{ textDecoration: "underline", color: "blue", cursor: 'pointer', fontSize: '13px', display: 'inline' }}>
-            Sign Up
+            Register
           </small>
         </div>
       </Box>

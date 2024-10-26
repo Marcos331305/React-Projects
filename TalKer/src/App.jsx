@@ -6,6 +6,7 @@ import Login from './components/Login.jsx'
 import SignUp from './components/SignUp.jsx'
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import TalkerUi from "./components/TalkerUi.jsx";
+import Mailverification from "./components/MailVerification.jsx";
 
 const router = createBrowserRouter([
   {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
   {
     path: "/signUp",
     element: <SignUp />
+  },
+  {
+    path: "/verifyMail",
+    element: <Mailverification />
   },
   {
     path: "/talker",
