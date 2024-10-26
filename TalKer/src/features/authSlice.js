@@ -1,6 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { supabase } from "../scripts/supabaseClient";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithEmailAndPassword,
+  sendEmailVerification
+} from "firebase/auth";
 
 const initialState = {
   user: {
@@ -11,81 +17,67 @@ const initialState = {
   // loading: false,
   error: null,
   isAuthenticated: false,
-  successfullAuthMsg: null
+  successfullAuthMsg: null,
 };
+
+export const handleSignup = createAsyncThunk(
+  "auth/handleSignup",
+  async (
+    { usernameInput, emailInput, passwordInput, rememberMe },
+    { rejectWithValue }
+  ) => {
+    const displayName = usernameInput;
+    // handling userSignup with FireBase
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        emailInput,
+        passwordInput
+      );
+      // Signed up successfully
+      const user = userCredential.user;
+
+      // Set the display name for the user
+      await updateProfile(user, { displayName });
+      
+      // Return only serializable fields to the Redux store
+      return {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName, // This now includes the updated displayName
+      };
+    } catch (error) {
+      // Handle errors
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
 
 export const handleLogin = createAsyncThunk(
   "auth/handleLogin",
-  async ({ emailInput, passwordInput }) => {
-    // handling userLogin with supabase
+  async ({ email, password }, { rejectWithValue }) => {
     try {
-      const { user, session, error } = await supabase.auth.signInWithPassword({
-        email: emailInput, // Corrected key here
-        password: passwordInput, // Corrected key here
-      });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-      if (error) {
-        throw new Error(error.message); // Throw error to be caught in the rejected case
-      }
-
-      // Return user data or session if successful
-      return { user, session }; // This will be passed to the fulfilled case
+      // Return only serializable fields to the Redux store
+      return {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName, // This now includes the updated displayName if set
+      };
     } catch (error) {
-      console.log(`Login Failed!, Because = ${error.message}`);
-      throw error; // Rethrow the error to be caught in the rejected case
+      return rejectWithValue(error.message); // Return the error message with rejectWithValue
     }
   }
 );
-
-// export const handleSignup = createAsyncThunk(
-//   "auth/handleSignup",
-//   async ({ usernameInput, emailInput, passwordInput, rememberMe }) => {
-//     // handling userSignup with supabase
-//     try {
-//       const { user, session, error } = await supabase.auth.signUp({
-//         email: emailInput, // Corrected key here
-//         password: passwordInput, // Corrected key here
-//       });
-//       console.log("Supabase signup response:", { data, error });
-
-//       if (error) {
-//         throw new Error(error.message); // Throw error to be caught in the rejected case
-//       }
-
-//       // Return user data or session if successful
-//       return { user, session }; // This will be passed to the fulfilled case
-//     } catch (error) {
-//       console.log(`Signup Failed!, Because = ${error.message}`);
-//       throw error; // Rethrow the error to be caught in the rejected case
-//     }
-//   }
-// );
-export const handleSignup = createAsyncThunk(
-  "auth/handleSignup",
-  async ({ emailInput, passwordInput }, { rejectWithValue }) => {
-    try {
-      // Attempt to sign up the user
-      const { user, session, error } = await supabase.auth.signUp({
-        email: emailInput,
-        password: passwordInput,
-      });
-
-      // Check for errors, including duplicate email
-      if (error) {
-        if (error.message.includes("User already registered")) {
-          return rejectWithValue("This email is already registered. Please log in.");
-        }
-        throw new Error(error.message);
-      }
-
-      return { user, session }; // Successful signup
-    } catch (error) {
-      console.log(`Signup Failed! Reason: ${error.message}`);
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 
 export const authSlice = createSlice({
   name: "auth",
@@ -100,6 +92,21 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Handle Signup Actions
+      .addCase(handleSignup.pending, (state) => {
+        state.error = null; // Clear previous errors
+        state.successfullAuthMsg = null; // Clear previous messages
+      })
+      .addCase(handleSignup.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        console.log(action.payload);
+        // You can also set state with user data or session if needed
+        // state.user = action.payload.user; // Example
+      })
+      .addCase(handleSignup.rejected, (state, action) => {
+        state.error = action.payload; // Capture error message
+      })
+
       // Handle Login Actions
       .addCase(handleLogin.pending, (state) => {
         state.error = null; // Clear previous errors
@@ -111,20 +118,6 @@ export const authSlice = createSlice({
         // state.user = action.payload.user; // Example
       })
       .addCase(handleLogin.rejected, (state, action) => {
-        state.error = action.error.message; // Capture error message
-      })
-
-      // Handle Signup Actions
-      .addCase(handleSignup.pending, (state) => {
-        state.error = null; // Clear previous errors
-        state.successfullAuthMsg = null; // Clear previous messages
-      })
-      .addCase(handleSignup.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        // You can also set state with user data or session if needed
-        // state.user = action.payload.user; // Example
-      })
-      .addCase(handleSignup.rejected, (state, action) => {
         state.error = action.error.message; // Capture error message
       });
   },

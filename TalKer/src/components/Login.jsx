@@ -46,18 +46,18 @@ export default function Login() {
           }
         });
       }, 1000);
-  
+
       // Check when the countdown hits 0 and then navigate
       if (countDown === 0) {
         dispatch(setAuthState());
         navigate('/talker');
       }
-  
+
       // Clean up the interval when component unmounts or authState changes
       return () => clearInterval(timer);
     }
   }, [authState.isAuthenticated, countDown, navigate]);
-  
+
   const [showPassword, setShowPassword] = useState(false);
 
   //Inputs
@@ -144,6 +144,35 @@ export default function Login() {
         padding: 1,
         width: '350px',
       }}>
+        {/* Show Form Error if any */}
+        {formValid && (
+          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {formValid}
+            </Alert>
+          </Stack>
+        )}
+        {authState.error && (
+          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
+            <Alert severity="error" size="small">
+              {authState.error}
+            </Alert>
+          </Stack>
+        )}
+
+        {/* Show final logging in message with countdown if no issues with login process */}
+        {authState.isAuthenticated && (
+          <Stack sx={{ width: "100%", paddingBottom: "10px" }} spacing={2}>
+            <Alert severity="success" size="small">
+              {`Logging in, Please wait for `}
+              <span style={{ fontWeight: 'bold', color: 'red' }}>
+                {countDown}
+              </span>
+              {` seconds ...`}
+            </Alert>
+          </Stack>
+        )}
+
         <div>
           <TextField
             label="Email Address"
@@ -212,35 +241,6 @@ export default function Login() {
             LOGIN
           </Button>
         </div>
-
-        {/* Show Form Error if any */}
-        {formValid && (
-          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
-            <Alert severity="error" size="small">
-              {formValid}
-            </Alert>
-          </Stack>
-        )}
-        {authState.error && (
-          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
-            <Alert severity="error" size="small">
-              {authState.error}
-            </Alert>
-          </Stack>
-        )}
-
-        {/* Show final logging in message with countdown if no issues with login process */}
-        {authState.isAuthenticated && (
-          <Stack sx={{ width: "100%", paddingTop: "10px" }} spacing={2}>
-            <Alert severity="success" size="small">
-              {`Logging in, Please wait for `}
-              <span style={{ fontWeight: 'bold', color: 'red' }}>
-                {countDown}
-              </span>
-              {` seconds ...`}
-            </Alert>
-          </Stack>
-        )}
 
         <div style={{ marginTop: "16px", fontSize: "10px" }} margin="left">
           <a style={{ fontSize: '15px' }}>Forgot Password</a>
