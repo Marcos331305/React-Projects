@@ -5,11 +5,12 @@ import ChatArea from './ChatArea'
 import { Box } from '@mui/material'
 
 const TalkerUi = () => {
+  const apiKey = import.meta.env.VITE_TALKER_API_KEY;
   return (
     <Box sx={{
       display: 'flex',
       flexDirection: 'column',
-      height: '100vh', // Full height of the viewport
+      height: '100dvh', // Full height of the viewport
     }}>
       <Nav />
       <ChatArea />
