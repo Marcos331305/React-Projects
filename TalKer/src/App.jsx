@@ -5,7 +5,7 @@ import {
 import Login from './components/Login.jsx'
 import SignUp from './components/SignUp.jsx'
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import TalkerUi from "./components/TalkerUi.jsx";
+import TalkerUi from "./components/talker/TalkerUi.jsx";
 import Mailverification from "./components/MailVerification.jsx";
 
 const router = createBrowserRouter([
