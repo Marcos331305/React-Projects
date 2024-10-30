@@ -141,14 +141,25 @@ export default function Login() {
       height: '100vh',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      flexDirection: 'column',
+      bgcolor: 'white',
+      gap: {
+        xs: '40px',  // Gap for extra-small screens
+        sm: '65px',  // Gap for small screens
+      },
     }}>
+      <Box sx={{
+        width: '80px',
+      }}>
+        <img width={'100%'} src="/talkerLogo.svg" alt="Talker-Logo" />
+      </Box>
       <Box sx={{
         padding: 1,
         width: '350px',
         p: 2,
         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.15), 0px 2px 4px rgba(0, 0, 0, 0.1)',
-        borderRadius: '7px'
+        borderRadius: '7px',
       }}>
         {/* LoadingView */}
         <Loading loading={loading} message={'Logging in, please wait...'} />
@@ -214,8 +225,12 @@ export default function Login() {
           <Button
             variant="contained"
             fullWidth
-            startIcon={<LoginIcon />}
+            startIcon={<LoginIcon color="#fff" />}
             onClick={handleSubmit}
+            sx={{
+              bgcolor: '#009688',
+              color: 'white'
+            }}
           >
             LOGIN
           </Button>
@@ -240,8 +255,8 @@ export default function Login() {
         <div style={{ marginTop: "16px", fontSize: "10px" }} margin="left">
           <a style={{ fontSize: '15px' }}>Forgot Password</a>
           <br />
-          <p style={{ display: 'inline', fontSize: '15px' }}>Don't have an account ?{" "}</p>
-          <small onClick={handleSignupClick} style={{ textDecoration: "underline", color: "blue", cursor: 'pointer', fontSize: '13px', display: 'inline' }}>
+          <p style={{ display: 'inline', fontSize: '15px' }}>Don't have an account?{" "}</p>
+          <small onClick={handleSignupClick} style={{ textDecoration: "underline", color: "#7b1fa2", cursor: 'pointer', fontSize: '13px', display: 'inline' }}>
             Register
           </small>
         </div>

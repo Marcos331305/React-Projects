@@ -143,10 +143,21 @@ export default function Login() {
       minHeight: '100vh',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      bgcolor: 'white',
+      flexDirection: 'column',
+      gap: {
+        xs: '40px',  // Gap for extra-small screens
+        sm: '65px',  // Gap for small screens
+      },
     }}>
       {/* LoadingView */}
       <Loading loading={loading} message={'Registering, please wait...'} />
+      <Box sx={{
+        width: '80px',
+      }}>
+        <img width={'100%'} src="/talkerLogo.svg" alt="Talker-Logo" />
+      </Box>
       <Box sx={{
         padding: 1,
         width: '350px',
@@ -224,6 +235,10 @@ export default function Login() {
             fullWidth
             startIcon={<LoginIcon />}
             onClick={handleSubmit}
+            sx={{
+              bgcolor: '#009688',
+              color: 'white'
+            }}
           >
             Register
           </Button>
@@ -245,8 +260,8 @@ export default function Login() {
           </Stack>
         )}
         <div style={{ fontSize: "10px", marginTop: "16px" }} margin="left">
-          <p style={{ fontSize: '15px', display: 'inline' }}>Do you have an account ?{" "}</p>
-          <small onClick={handleLoginClick} style={{ textDecoration: "underline", color: "blue", fontSize: '13px', cursor: 'pointer' }}>
+          <p style={{ fontSize: '15px', display: 'inline' }}>Do you have an account?{" "}</p>
+          <small onClick={handleLoginClick} style={{ textDecoration: "underline", color: "#7b1fa2", fontSize: '13px', cursor: 'pointer' }}>
             Login
           </small>
         </div>
