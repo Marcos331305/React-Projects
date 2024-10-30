@@ -7,7 +7,8 @@ import {
   signInWithEmailAndPassword,
   sendEmailVerification,
   browserLocalPersistence,
-  browserSessionPersistence
+  browserSessionPersistence,
+  setPersistence,
 } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../scripts/firebase";
@@ -53,15 +54,8 @@ export const handleSignup = createAsyncThunk(
         });
       }
 
-      // Define your custom URL for the verification link
-      const actionCodeSettings = {
-        // URL you want to redirect back to after verification
-        url: "http://localhost:5173/verifyMail", // Change this to your desired URL
-        handleCodeInApp: true, // Required for this to work
-      };
-
       // Sending the verification link to User
-      await sendEmailVerification(user, actionCodeSettings);
+      await sendEmailVerification(user);
 
       // Return only serializable fields to the Redux store
       return {
@@ -71,9 +65,14 @@ export const handleSignup = createAsyncThunk(
       };
     } catch (error) {
       // Handle errors
-      const errorCode = error.code;
       const errorMessage = error.message;
-      return rejectWithValue(errorMessage);
+      let customMessage;
+      if(error.code === 'auth/email-already-in-use'){
+        customMessage = 'This email already in use.';
+        return rejectWithValue(customMessage);
+      } else{
+        return rejectWithValue(errorMessage); // Return the error message with rejectWithValue
+      }
     }
   }
 );
@@ -82,10 +81,12 @@ export const handleLogin = createAsyncThunk(
   "auth/handleLogin",
   async ({ emailInput, passwordInput, rememberMe }, { rejectWithValue }) => {
     // Set the persistence based on the rememberMe checkbox
-    const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+    const persistence = rememberMe
+      ? browserLocalPersistence
+      : browserSessionPersistence;
     try {
       const auth = getAuth();
-      await auth.setPersistence(persistence); // Set persistence for userSession
+      await setPersistence(auth, persistence); // Set persistence for userSession
       const userCredential = await signInWithEmailAndPassword(
         auth,
         emailInput,
@@ -93,14 +94,39 @@ export const handleLogin = createAsyncThunk(
       );
       const user = userCredential.user;
 
+      await auth.currentUser.reload(); // Refresh the user state
+      const refreshedUser = auth.currentUser;
+
       // Return only serializable fields to the Redux store
       return {
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName, // This now includes the updated displayName if set
+        uid: refreshedUser.uid,
+        email: refreshedUser.email,
+        displayName: refreshedUser.displayName, // This now includes the updated displayName if set
+        emailVerified: refreshedUser.emailVerified,
       };
     } catch (error) {
-      return rejectWithValue(error.message); // Return the error message with rejectWithValue
+      // Handle errors
+      let customMessage;
+      switch (error.code) {
+        case "auth/invalid-credential":
+          customMessage = "Invalid usercredentials, please check.";
+          break;
+        case "auth/invalid-email":
+          customMessage = "The email address is not valid. Please check again.";
+          break;
+        case "auth/user-not-found":
+          customMessage = "No account found with this email.";
+          break;
+        case "auth/wrong-password":
+          customMessage = "Incorrect password. Please try again.";
+          break;
+        case "auth/user-disabled":
+          customMessage = "This account has been disabled. Contact support.";
+          break;
+        default:
+          customMessage = "An error occurred. Please try again.";
+      }
+      return rejectWithValue(customMessage);
     }
   }
 );
@@ -122,13 +148,11 @@ export const authSlice = createSlice({
       .addCase(handleSignup.pending, (state) => {
         state.loading = true;
         state.error = null; // Clear previous errors
-        state.successfullAuthMsg = null; // Clear previous messages
       })
       .addCase(handleSignup.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
         toast.success(
-          "User Registered Successfully && verification link sent at Email!!",
+          "Registered Successfully, verification link sent at Email!!",
           {
             position: "top-center",
           }
@@ -145,17 +169,25 @@ export const authSlice = createSlice({
       .addCase(handleLogin.pending, (state) => {
         state.loading = true;
         state.error = null; // Clear previous errors
-        state.successfullAuthMsg = null; // Clear previous messages
       })
-      .addCase(handleLogin.fulfilled, (state) => {
-        state.loading = false;
-        state.isAuthenticated = true;
+      .addCase(handleLogin.fulfilled, (state, action) => {
+        const { emailVerified } = action.payload;
+        if (emailVerified) {
+          state.loading = false;
+          state.isAuthenticated = true;
+          // Set user data if needed, e.g., state.user = action.payload;
+        } else {
+          state.loading = false;
+          state.error = "Please verify your email before log-In.";
+          state.isAuthenticated = false;
+        }
         // You can also set state with user data or session if needed
         // state.user = action.payload.user; // Example
       })
       .addCase(handleLogin.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; // Capture error message
+        state.error =
+          action.payload || "An error occurred, please try after someTime."; // Capture error message
       });
   },
 });

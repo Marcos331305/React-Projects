@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleSignup, setAuthState } from '../features/authSlice'
+import { handleSignup } from '../features/authSlice'
 import Loading from "./Loading.jsx";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-const auth = getAuth();
 
 // Material UI Imports
 import {
@@ -32,13 +31,7 @@ import { useNavigate } from "react-router-dom";
 const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
-export default function Login() {
-  useEffect(() => {
-    auth.onAuthStateChanged((userCred)=>{
-      console.log(userCred)
-    });
-  }, [])
-  
+export default function Login() {  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const authState = useSelector((state) => state.auth);

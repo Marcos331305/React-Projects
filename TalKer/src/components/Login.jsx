@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleLogin, setAuthState } from '../features/authSlice'
+import { handleLogin } from '../features/authSlice'
 import Loading from "./Loading";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Material UI Imports
 import {
@@ -33,15 +34,30 @@ export default function Login() {
   const dispatch = useDispatch();
   const authState = useSelector((state) => state.auth);
   const loading = authState.loading;
+  const [showPassword, setShowPassword] = useState(false);
+  const [loadingSession, setLoadingSession] = useState(true);
+
+  // Checking for user session for automatic login
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (userCred) => {
+      if (userCred && userCred.emailVerified) {
+        // User is signed in and email is verified; navigate to protected route
+        navigate('/talker', { replace: true });
+      }
+      // If user is signed in but email is not verified, do nothing
+      setLoadingSession(false); // End loading state to render login UI
+    });
+
+    return unsubscribe;
+  }, [navigate]);
 
   // Navigate the user to their appropriate ui after login
   useEffect(() => {
     if (authState.isAuthenticated) {
       navigate('/talker', { replace: true });
     }
-  }, [authState.isAuthenticated,navigate]);
-
-  const [showPassword, setShowPassword] = useState(false);
+  }, [authState.isAuthenticated, navigate]);
 
   //Inputs
   const [emailInput, setEmailInput] = useState('');
@@ -116,6 +132,10 @@ export default function Login() {
     navigate('/signUp');
   };
 
+  if (loadingSession) {
+    return <Loading message="Checking session, please wait..." />; // Display loading while checking session
+  }
+
   return (
     <Box sx={{
       height: '100vh',
@@ -182,7 +202,7 @@ export default function Login() {
         </div>
 
         <div style={{ fontSize: "15px", display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-          <Checkbox
+          <Checkbox id="rememberMe-checkbox"
             {...label}
             size="medium"
             onChange={(event) => setRememberMe(event.target.checked)}
