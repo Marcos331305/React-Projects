@@ -13,16 +13,12 @@ import {
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "../scripts/firebase";
 import { toast } from "react-toastify";
+import { supabase } from "../scripts/supabaseClient";
 
 const initialState = {
-  // user: {
-  //   name: null,
-  //   email: null,
-  // },
   loading: false,
   error: null,
   isAuthenticated: false,
-  // successfullAuthMsg: null,
 };
 
 export const handleSignup = createAsyncThunk(
@@ -46,12 +42,26 @@ export const handleSignup = createAsyncThunk(
       // Set the display name for the user
       await updateProfile(user, { displayName });
 
-      // Store userData in dB
+      // Store userData in firebasedB
       if (user) {
         await setDoc(doc(db, "Users", user.uid), {
           name: user.displayName,
           email: user.email,
         });
+      }
+
+      // Store userData in supabasedB
+      if (user) {
+        await supabase
+          .from("users") // Replace with your table name
+          .insert([
+            {
+              user_id: user.uid, // Replace with your column name and value
+              name: user.displayName,
+              email: user.email
+              // Add more columns as needed
+            },
+          ]);
       }
 
       // Sending the verification link to User
@@ -67,10 +77,10 @@ export const handleSignup = createAsyncThunk(
       // Handle errors
       const errorMessage = error.message;
       let customMessage;
-      if(error.code === 'auth/email-already-in-use'){
-        customMessage = 'This email already in use.';
+      if (error.code === "auth/email-already-in-use") {
+        customMessage = "This email already in use.";
         return rejectWithValue(customMessage);
-      } else{
+      } else {
         return rejectWithValue(errorMessage); // Return the error message with rejectWithValue
       }
     }

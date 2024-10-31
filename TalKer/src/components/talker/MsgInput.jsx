@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputBase, IconButton, Typography, Box } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { useSelector, useDispatch } from 'react-redux'
+import { addMessage } from '../../features/messageSlice'
 
 const MsgInput = () => {
+  const [message, setMessage] = useState('');
+  const dispatch = useDispatch();
+
+  // handle Msg sending btn
+  const handleSend = () => {
+    const cleanedMessage = message.trim().replace(/\s+/g, ' ');
+    console.log('clicked')
+  };
+
   return (
     <Box sx={{ maxWidth: '600px' }}>
       {/* Custom Input Field */}
@@ -17,7 +28,7 @@ const MsgInput = () => {
           mx: '12px'
         }}
       >
-        <InputBase id='Message-Input'
+        <InputBase id='Message-Input' onChange={(e) => setMessage(e.target.value)}
           placeholder="Message TalKer"
           sx={{
             flex: 1,
@@ -32,19 +43,20 @@ const MsgInput = () => {
         />
         
         {/* Send Button */}
-        <IconButton
+        <IconButton onClick={handleSend} disabled={!message.trim()} 
           sx={{
-            backgroundColor: '#676767',
-            color: 'secondary',
+            backgroundColor: !message.trim() ? '#676767 !important' : 'white',
             borderRadius: '50%', // Fully rounded
             padding: '8px',
             marginLeft: '8px',
             '&:hover': {
-              backgroundColor: '#e0e0e0',
+              backgroundColor: !message.trim() ? '#676767 !important' : 'white',
             },
           }}
         >
-          <KeyboardArrowUpIcon />
+          <KeyboardArrowUpIcon sx={{
+            color: !message.trim() ? '#2F2F2F !important' : '#000000',
+          }} />
         </IconButton>
       </Box>
 
