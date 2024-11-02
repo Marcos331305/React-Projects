@@ -12,8 +12,6 @@ const ChatArea = () => {
                 flexGrow: 1,
                 overflowY: 'auto', // Enable vertical scrolling
                 borderRadius: '8px', // Optional: rounded corners
-                px: '12px', // Padding inside the chat area
-                py: '18px',
             }}
         >
             {/* User Messages & their Responses */}
@@ -36,15 +34,24 @@ const ChatArea = () => {
                 </Box>
             ) : (
                 messages.map((msg) => (
-                    msg.sender === 'user' ? (
-                        <UserMessageContainer key={msg.id} message={msg.content} />
-                    ) : (
-                        <AiMessageContainer key={msg.id} message={msg.content} />
-                    )
+                    <Box
+                        key={msg.id}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start', // Align messages
+                        }}
+                    >
+                        {msg.sender === 'user' ? (
+                            <UserMessageContainer message={msg.content} />
+                        ) : (
+                            <AiMessageContainer message={msg.content} />
+                        )}
+                    </Box>
                 ))
             )}
         </Box>
     );
 };
+
 
 export default ChatArea;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
+import ReactMarkdown from 'react-markdown';
 
 // Styled container for AI messages
 const Container = styled(Box)({
@@ -8,8 +9,9 @@ const Container = styled(Box)({
     alignItems: 'flex-start', // Align items at the start
     borderRadius: '8px',
     padding: '0px',
-    marginBottom: '18px',
     color: 'white',
+    paddingInline: '12px',
+    paddingBlock: '18px'
 });
 
 // Styled logo
@@ -36,14 +38,15 @@ const AiMessageContainer = ({ message }) => {
             </Box>
 
             {/* Text container with top margin */}
-            <Typography sx={{
+            <Box sx={{
                 lineHeight: '28px',
-                flex: 1, // Allows the text to grow and take up space
-                wordBreak: 'break-word', // Ensures long words wrap properly
-                marginTop: '2px', // Add top margin to the text
-            }} variant="body1">
-                {message}
-            </Typography>
+                flex: 1,
+                wordBreak: 'break-word',
+                marginTop: '-14px',
+            }}>
+                {/* Using ReactMarkdown to render the message */}
+                <ReactMarkdown>{message}</ReactMarkdown>
+            </Box>
         </Container>
     );
 };

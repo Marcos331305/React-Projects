@@ -12,13 +12,15 @@ const UserMessageContainer = ({ message }) => {
                 maxWidth: '70%', // Limit the width of the message
                 width: 'fit-content', // Only takes as much width as required
                 alignSelf: 'flex-end', // Aligns the box to the right side
-                marginBottom: '18px', // Spacing between messages
                 wordWrap: 'break-word', // Ensures long words break correctly
+                marginBlock: '18px',
+                marginInline: '12px'
             }}
         >
             <Typography variant="body1">{message}</Typography>
         </Box>
     );
 };
+
 
 export default UserMessageContainer;
