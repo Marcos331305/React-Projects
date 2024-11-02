@@ -42,7 +42,7 @@ const AiMessageContainer = ({ message }) => {
                 lineHeight: '28px',
                 flex: 1,
                 wordBreak: 'break-word',
-                marginTop: '-14px',
+                marginTop: '-13px',
             }}>
                 {/* Using ReactMarkdown to render the message */}
                 <ReactMarkdown>{message}</ReactMarkdown>
