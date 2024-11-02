@@ -37,9 +37,9 @@ const ChatArea = () => {
             ) : (
                 messages.map((msg) => (
                     msg.sender === 'user' ? (
-                        <UserMessageContainer key={msg.id} message={msg.text} />
+                        <UserMessageContainer key={msg.id} message={msg.content} />
                     ) : (
-                        <AiMessageContainer key={msg.id} message={msg.text} />
+                        <AiMessageContainer key={msg.id} message={msg.content} />
                     )
                 ))
             )}

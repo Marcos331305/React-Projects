@@ -2,31 +2,26 @@ import React, { useState } from 'react';
 import { InputBase, IconButton, Typography, Box } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useSelector, useDispatch } from 'react-redux'
-import { addMessage } from '../../features/messageSlice'
+import { addMessage, talkerResponse } from '../../features/messageSlice'
 import { generateUniqueId } from '../../scripts/app'
-import { useFetchAdaResponseMutation } from '../../features/apiSlice';
 
 const MsgInput = () => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
-  const [fetchAiResponse] = useFetchAdaResponseMutation();
 
   // handle Msg sending btn
-  const handleSend = async() => {
-    console.log('clicked')
+  const handleSend = () => {
     const cleanedMessage = message.trim().replace(/\s+/g, ' ');
     const userMessage = {
       id: generateUniqueId(), // A unique identifier for each message (e.g., a UUID)
-      text: cleanedMessage, // The message content
-      sender: 'user' // Who sent the message: 'user' or 'ai'
+      content: cleanedMessage, // The message content
+      sender: 'user' // Who sent the message: 'user' or 'TalKer'
     };
     dispatch(addMessage(userMessage));
     // after adding the message ot ui clear the msgInput field
     setMessage('');
-
     // Afterthat handling the Response-Generation
-    const result = await fetchAiResponse(userMessage.text).unwrap();
-    console.log(result)
+   dispatch(talkerResponse(userMessage.content));
   };
 
   return (

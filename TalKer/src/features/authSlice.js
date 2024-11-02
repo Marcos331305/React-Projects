@@ -145,9 +145,6 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    general: (state, action) => {
-      state.value += action.payload;
-    },
     setAuthState: (state) => {
       state.isAuthenticated = false;
     },
@@ -203,6 +200,6 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setAuthState, incrementByAmount } = authSlice.actions;
+export const { setAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
