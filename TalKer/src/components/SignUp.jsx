@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { handleSignup } from '../features/authSlice'
 import Loading from "./Loading.jsx";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 // Material UI Imports
 import {
