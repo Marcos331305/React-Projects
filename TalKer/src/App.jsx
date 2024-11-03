@@ -11,7 +11,7 @@ import Mailverification from "./components/MailVerification.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Login />, // Publice Route
+    element: <Login />, // Public Route
   },
   {
     path: "/signUp",
@@ -23,11 +23,21 @@ const router = createBrowserRouter([
   },
   {
     path: "/talker",
-    element: ( // Protection for this component using ProtectedRouted component
+    element: (
       <ProtectedRoute>
         <TalkerUi />
       </ProtectedRoute>
-    )
+    ),
+    children: [
+      {
+        path: "", // Matches "/talker"
+        element: <TalkerUi />
+      },
+      {
+        path: "c/:conversationId", // Matches "/talker/c/:conversationId"
+        element: <TalkerUi />
+      }
+    ]
   },
 ]);
 

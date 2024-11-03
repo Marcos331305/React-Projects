@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { InputBase, IconButton, Typography, Box } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useSelector, useDispatch } from 'react-redux'
-import { addMessage, talkerResponse } from '../../features/messageSlice'
+import { addMsg, talkerResponse } from '../../features/messageSlice'
 import { generateUniqueId } from '../../scripts/app'
 
 const MsgInput = () => {
@@ -17,7 +17,7 @@ const MsgInput = () => {
       content: cleanedMessage, // The message content
       sender: 'user' // Who sent the message: 'user' or 'TalKer'
     };
-    dispatch(addMessage(userMessage));
+    dispatch(addMsg(userMessage));
     // after adding the message ot ui clear the msgInput field
     setMessage('');
     // Afterthat handling the Response-Generation
@@ -25,7 +25,17 @@ const MsgInput = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '600px' }}>
+    <Box sx={{
+      maxWidth: {
+        xs: '600px',
+      },
+      width: {
+        sm: '600px'
+      },
+      mx: {
+        sm: 'auto'
+      },
+    }}>
       {/* Custom Input Field */}
       <Box
         sx={{

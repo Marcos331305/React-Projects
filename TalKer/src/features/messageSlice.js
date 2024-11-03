@@ -28,11 +28,11 @@ export const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    addMessage: (state, action) => {
-      state.messages.push(action.payload);
+    createMsg: (state, action) => {
+
     },
-    incrementByAmount: (state, action) => {
-      state.value += action.payload;
+    addMsg: (state, action) => {
+      state.messages.push(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -54,6 +54,6 @@ export const messageSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addMessage, incrementByAmount } = messageSlice.actions;
+export const { addMsg, incrementByAmount } = messageSlice.actions;
 
 export default messageSlice.reducer;
