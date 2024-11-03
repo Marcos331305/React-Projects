@@ -11,12 +11,18 @@ import {
   ListItemIcon,
   Avatar,
   Box,
+  Popover,
+  Divider
 } from '@mui/material';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useMediaQuery } from '@mui/material';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setAuthState } from '../../features/authSlice';
 
 const conversations = [
   { id: 1, title: 'Conversation 1' },
@@ -51,6 +57,10 @@ const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [user, setUser] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [clicked, setClicked] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // useEffect for getting the userDetails when the component Mount's
   useEffect(() => {
@@ -59,7 +69,6 @@ const Nav = () => {
       if (user) {
         // User is signed in
         setUser(user);
-        console.log(user)
       } else {
         // User is signed out
         setUser(null);
@@ -68,7 +77,7 @@ const Nav = () => {
 
     return () => unsubscribe(); // Clean up subscription on unmount
   }, []);
-  
+
   // Check if screen size is medium or larger
   const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
@@ -78,6 +87,28 @@ const Nav = () => {
 
   const handleItemClick = (index) => {
     setActiveIndex(index);
+  };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
+  // handle logOut
+  const handleLogOut = () => {
+    setClicked(true);
+    const auth = getAuth();
+    // firebase logOut functionality
+    setTimeout(async() => {
+      await signOut(auth);
+      dispatch(setAuthState()); // set the userAuthenticated state to false first that have using in authSlice
+      navigate('/'); // Redirect the user to Home-Page(loginPage)
+    }, 1000); // Duration of the logOut process
   };
 
   return (
@@ -173,13 +204,51 @@ const Nav = () => {
             ))}
           </List>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', py: '8px', px: '14px', marginTop: 'auto' }}>
-            <Avatar alt="User Avatar" src={user.photoURL} />
+          {/* userAccount */}
+          <Box onClick={handleClick} sx={{ display: 'flex', alignItems: 'center', py: '8px', px: '14px', marginTop: 'auto', backgroundColor: open ? '#212121' : 'transparent', }}>
+            <Avatar alt="User Avatar" src={(user) && user.photoURL} />
             <Box sx={{ marginLeft: 1 }}>
-              <Typography variant="body1" color='white'>{user.displayName}</Typography>
-              <Typography variant="body2" color='white'>{user.email}</Typography>
+              <Typography variant="body1" color='white'>{(user) && user.displayName}</Typography>
+              <Typography variant="body2" color='white'>{(user) && user.email}</Typography>
             </Box>
           </Box>
+
+          {/* menuOfUserAccount */}
+          <Popover
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+          >
+            <List sx={{ width: 240, bgcolor: '#2F2F2F', border: '1px solid #444343' }}>
+              {/* Email at the top */}
+              <ListItem>
+                <Typography variant="body2" sx={{ color: 'white', py: '8px', px: '2px' }}>{(user) && user.email}</Typography>
+              </ListItem>
+
+              <Divider sx={{ bgcolor: '#444343' }} />
+
+              {/* Logout option */}
+              <ListItem sx={{
+                transform: clicked ? 'scale(0.95)' : 'scale(1)',
+                transition: 'transform 0.1s ease',
+                '&:hover': {
+                  backgroundColor: '#444',
+                },
+              }}
+                button onClick={handleLogOut}>
+                <LogoutIcon sx={{ color: 'white', marginRight: 1 }} />
+                <ListItemText primary={clicked ? "Logging out..." : "Logout"} sx={{ color: 'white' }} />
+              </ListItem>
+            </List>
+          </Popover>
         </Box>
       </Drawer>
     </>
