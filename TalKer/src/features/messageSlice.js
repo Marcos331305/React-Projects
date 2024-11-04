@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { generateUniqueId } from '../scripts/app'
+import { generateUniqueId } from "../scripts/app";
 
 const initialState = {
   messages: [],
   loading: false,
-  error: null
+  error: null,
 };
 
 // Thunk for generating the AiResponse/message
@@ -43,14 +43,14 @@ export const fetchMessages = createAsyncThunk(
   }
 );
 
+// Thunk for storing a newMessage in supaBase
+
 
 export const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    createMsg: (state, action) => {
-
-    },
+    createMsg: (state, action) => {},
     addMsg: (state, action) => {
       state.messages.push(action.payload);
     },
@@ -64,7 +64,11 @@ export const messageSlice = createSlice({
       .addCase(talkerResponse.fulfilled, (state, action) => {
         state.loading = false;
         // Store the talkerResponse in the messages state
-        state.messages.push({ id: generateUniqueId(), content: action.payload, sender: 'TalKer' });
+        state.messages.push({
+          id: generateUniqueId(),
+          content: action.payload,
+          sender: "TalKer",
+        });
       })
       .addCase(talkerResponse.rejected, (state, action) => {
         state.loading = false;

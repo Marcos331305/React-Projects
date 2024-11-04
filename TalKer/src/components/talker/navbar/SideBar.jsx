@@ -23,6 +23,7 @@ import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { clearActiveConversationId } from '../../../features/conversationsSlice';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [activeIndex, setActiveIndex] = useState(null);
@@ -79,6 +80,11 @@ const SideBar = ({ isOpen, handleConBar }) => {
         }, 1000); // Duration of the logOut process
     };
 
+    const handleNewConversation = () => {
+        dispatch(clearActiveConversationId());
+        navigate('/talker');
+      };
+    
     return (
         <>
             <Drawer anchor="left" open={isOpen} onClose={handleConBar}>
@@ -87,7 +93,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         <IconButton onClick={handleConBar}>
                             <MenuOpenIcon color='primary' />
                         </IconButton>
-                        <IconButton>
+                        <IconButton onClick={handleNewConversation}>
                             <AddCircleIcon color='primary' />
                         </IconButton>
                     </Toolbar>

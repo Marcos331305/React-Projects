@@ -8,12 +8,20 @@ import {
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SideBar from './SideBar';
+import { clearActiveConversationId } from '../../../features/conversationsSlice';
+import { useDispatch } from 'react-redux';
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
 
   const handleConBar = () => {
     setIsOpen(!isOpen);
+};
+
+const handleNewConversation = () => {
+  dispatch(clearActiveConversationId());
+  navigate('/talker');
 };
 
   return (
@@ -26,7 +34,7 @@ const Nav = () => {
           <Typography color='primary' variant="h6" sx={{ flex: 1, textAlign: 'center', fontWeight: 600 }}>
             TalKer
           </Typography>
-          <IconButton edge="end" color="inherit" aria-label="new-conversation">
+          <IconButton onClick={handleNewConversation} edge="end" color="inherit" aria-label="new-conversation">
             <AddCircleIcon color='primary' />
           </IconButton>
         </Toolbar>
