@@ -18,40 +18,11 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-
-const conversations = [
-    { id: 1, title: 'Conversation 1' },
-    { id: 2, title: 'Conversation 2' },
-    { id: 3, title: 'Conversation 3' },
-    // Add more conversations as needed
-    { id: 4, title: 'Conversation 4' },
-    { id: 5, title: 'Conversation 5' },
-    { id: 6, title: 'Conversation 6' },
-    { id: 7, title: 'Conversation 7' },
-    { id: 8, title: 'Conversation 8' },
-    { id: 9, title: 'Conversation 9' },
-    { id: 10, title: 'Conversation 10' },
-    { id: 11, title: 'Conversation 11' },
-    { id: 12, title: 'Conversation 12' },
-    { id: 13, title: 'Conversation 13' },
-    { id: 14, title: 'Conversation 14' },
-    { id: 15, title: 'Conversation 15' },
-    { id: 16, title: 'Conversation 16' },
-    { id: 17, title: 'Conversation 17' },
-    { id: 18, title: 'Conversation 18' },
-    { id: 19, title: 'Conversation 19' },
-    { id: 20, title: 'Conversation 20' },
-    { id: 21, title: 'Conversation 21' },
-    { id: 22, title: 'Conversation 22' },
-    { id: 23, title: 'Conversation 23' },
-    { id: 24, title: 'Conversation 24' },
-    { id: 25, title: 'Conversation 25' },
-  ];
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [activeIndex, setActiveIndex] = useState(null);
@@ -60,6 +31,8 @@ const SideBar = ({ isOpen, handleConBar }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    // fetch conversationsState from the conversationsSlice to use in sideBars ui
+    const conversations = useSelector((state) => state.conversations.conversations);
 
     // useEffect for getting the userDetails when the component Mount's
     useEffect(() => {
@@ -156,7 +129,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         {/* Conversation Area */}
                         {conversations.map((convo, index) => (
                             <ListItem
-                                key={convo.id}
+                                key={convo.conversation_id}
                                 onClick={() => handleItemClick(index)}
                                 sx={{
                                     backgroundColor: activeIndex === index ? '#212121' : 'transparent',
@@ -165,6 +138,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                     },
                                     display: 'flex',
                                     justifyContent: 'space-between',
+                                    alignItems: 'center', // Ensures the text and icon align properly
                                 }}
                             >
                                 <ListItemText
@@ -173,6 +147,10 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                         color: '#ECECEC',
                                         fontSize: '14px',
                                         fontWeight: 400,
+                                        overflow: 'hidden',
+                                        whiteSpace: 'nowrap',
+                                        textOverflow: 'ellipsis',
+                                        maxWidth: activeIndex === index ? 'calc(100% - 40px)' : '100%', // Adjusts the space for the icon
                                     }}
                                 />
                                 {activeIndex === index && (
@@ -181,6 +159,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                     </ListItemIcon>
                                 )}
                             </ListItem>
+
                         ))}
                     </List>
 

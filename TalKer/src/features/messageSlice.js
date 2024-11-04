@@ -8,7 +8,7 @@ const initialState = {
   error: null
 };
 
-// Thunk to generating the AiResponse
+// Thunk for generating the AiResponse/message
 export const talkerResponse = createAsyncThunk(
   "messages/talkerResponse",
   async (prompt, { rejectWithValue }) => {
@@ -23,6 +23,26 @@ export const talkerResponse = createAsyncThunk(
     }
   }
 );
+
+// Thunk for fetching messages related to a conversation
+export const fetchMessages = createAsyncThunk(
+  "messages/fetchMessages",
+  async (conversation_id, { rejectWithValue }) => {
+    try {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conversation_id); // Filter messages by conversation_id
+
+      if (error) throw error;
+
+      return data; // Return the fetched messages
+    } catch (err) {
+      return rejectWithValue(err.message); // Handle errors
+    }
+  }
+);
+
 
 export const messageSlice = createSlice({
   name: "messages",

@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InputBase, IconButton, Typography, Box } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useSelector, useDispatch } from 'react-redux'
 import { addMsg, talkerResponse } from '../../features/messageSlice'
+import { addConversation, createConversationInSupabase, fetchConversations, generateConversationTitle } from '../../features/conversationsSlice'
 import { generateUniqueId } from '../../scripts/app'
+import { getAuth } from 'firebase/auth';
 
 const MsgInput = () => {
   const [message, setMessage] = useState('');
   const dispatch = useDispatch();
 
+  // fetch conversation when the component Mounts
+  useEffect(() => {
+    dispatch(fetchConversations());
+  }, [])
+  
+  // Initialize the Firebase Auth instance
+  const auth = getAuth();
+  // Get the current user
+  const user = auth.currentUser;
+
   // handle Msg sending btn
-  const handleSend = () => {
+  const handleSend = async () => {
     const cleanedMessage = message.trim().replace(/\s+/g, ' ');
     const userMessage = {
       id: generateUniqueId(), // A unique identifier for each message (e.g., a UUID)
@@ -21,7 +33,29 @@ const MsgInput = () => {
     // after adding the message ot ui clear the msgInput field
     setMessage('');
     // Afterthat handling the Response-Generation
-   dispatch(talkerResponse(userMessage.content));
+    dispatch(talkerResponse(userMessage.content));
+    // Generating the conversation title and adding the conversation in redexState to update ui
+    try {
+      // Afterthat generating the conversationTitle for a new Conversation & wait till generating it
+      const response = await dispatch(generateConversationTitle(userMessage.content));
+      const conversationTitle = response.payload;
+      const conversation = {
+        id: generateUniqueId(),
+        user_id: user.uid,
+        title: conversationTitle,
+      };
+      dispatch(addConversation(conversation));
+      // and creating the conversation in dB(supabase) also
+      dispatch(createConversationInSupabase(conversation));
+    } catch (error) {
+      const conversation = {
+        id: generateUniqueId(),
+        user_id: user.uid,
+        title: 'Untitled Conversation',
+      };
+      dispatch(addConversation(conversation));
+      dispatch(createConversationInSupabase(conversation));
+    }
   };
 
   return (

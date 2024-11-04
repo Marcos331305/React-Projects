@@ -1,4 +1,5 @@
 import { createTheme } from "@mui/material/styles";
+import { supabase } from "./supabaseClient";
 
 // Mui Theme
 const theme = createTheme({
@@ -29,6 +30,6 @@ export default theme;
 export function generateUniqueId() {
   const timestamp = Date.now(); // Current timestamp
   const randomSuffix = Math.floor(1000 + Math.random() * 9000); // Random integer between 1000 and 9999
-  return `${timestamp}-${randomSuffix}`; // Combine timestamp and random number
+  const stringId = `${timestamp}${randomSuffix}`; // Combine timestamp and random number
+  return Number(stringId);
 }
-
