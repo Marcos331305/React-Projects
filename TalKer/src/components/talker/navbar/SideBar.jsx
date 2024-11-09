@@ -54,8 +54,9 @@ const SideBar = ({ isOpen, handleConBar }) => {
     // Check if screen size is medium or larger
     const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
-    const handleItemClick = (index) => {
+    const handleItemClick = (index, convoId) => {
         setActiveIndex(index);
+        navigate(`/talker/c/${convoId}`);
     };
 
     const handleClick = (event) => {
@@ -136,7 +137,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         {conversations.map((convo, index) => (
                             <ListItem
                                 key={convo.conversation_id}
-                                onClick={() => handleItemClick(index)}
+                                onClick={() => handleItemClick(index, convo.conversation_id)}
                                 sx={{
                                     backgroundColor: activeIndex === index ? '#212121' : 'transparent',
                                     '&:hover': {

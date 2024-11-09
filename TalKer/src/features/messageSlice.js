@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { generateUniqueId } from "../scripts/app";
+import { supabase } from "../scripts/supabaseClient";
 
 const initialState = {
   messages: [],
@@ -44,6 +45,27 @@ export const fetchMessages = createAsyncThunk(
 );
 
 // Thunk for storing a newMessage in supaBase
+export const storeMsgInSupabase = createAsyncThunk(
+  "messages/storeMsgInSupabase",
+  async ({ userMessage, conversation_id }, { rejectWithValue }) => {
+    try {
+      const { error } = await supabase
+        .from("messages")
+        .insert({
+          message_id: userMessage.id,
+          conversation_id: conversation_id,
+          sender: userMessage.sender,
+          content: userMessage.content
+        });
+
+      if (error) {
+        throw error;
+        }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 
 export const messageSlice = createSlice({

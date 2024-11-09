@@ -27,7 +27,7 @@ export const createConversationInSupabase = createAsyncThunk(
         .from("conversations") // Replace with your actual table name
         .insert([
           {
-            conversation_id: generateUniqueId(), // Generate a unique ID for the conversation
+            conversation_id: conversation.id, // Generate a unique ID for the conversation
             user_id: conversation.user_id,
             title: conversation.title,
           },
