@@ -1,11 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Box, Typography } from '@mui/material'
 import UserMessageContainer from './UserMessageContainer'
 import AiMessageContainer from './AiMessageContainer'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
+import { fetchMessages } from '../../features/messageSlice'
 
 const ChatArea = () => {
+    const  { conversationId }  = useParams(); // getting the conversationId from the routeParameters
     const messages = useSelector((state) => state.messages.messages);
+    const dispatch = useDispatch();
+
+    // getting the conversationMessages only if the conversationId is available
+    useEffect(() => {
+        if(conversationId){
+            dispatch(fetchMessages(conversationId));
+        }
+    },[conversationId]);
+
     return (
         <Box
             sx={{

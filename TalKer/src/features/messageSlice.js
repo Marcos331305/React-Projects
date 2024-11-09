@@ -49,24 +49,21 @@ export const storeMsgInSupabase = createAsyncThunk(
   "messages/storeMsgInSupabase",
   async ({ userMessage, conversation_id }, { rejectWithValue }) => {
     try {
-      const { error } = await supabase
-        .from("messages")
-        .insert({
-          message_id: userMessage.id,
-          conversation_id: conversation_id,
-          sender: userMessage.sender,
-          content: userMessage.content
-        });
+      const { error } = await supabase.from("messages").insert({
+        message_id: userMessage.id,
+        conversation_id: conversation_id,
+        sender: userMessage.sender,
+        content: userMessage.content,
+      });
 
       if (error) {
         throw error;
-        }
+      }
     } catch (error) {
       return rejectWithValue(error.message);
     }
   }
 );
-
 
 export const messageSlice = createSlice({
   name: "messages",
@@ -93,6 +90,21 @@ export const messageSlice = createSlice({
         });
       })
       .addCase(talkerResponse.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // handling action's for fetchingMessages
+      .addCase(fetchMessages.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchMessages.fulfilled, (state, action) => {
+        state.loading = false;
+        const messages = action.payload;
+        state.messages = [...state.messages, ...messages];
+        console.log(state.messages)
+      })
+      .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

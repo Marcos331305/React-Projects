@@ -56,7 +56,9 @@ const SideBar = ({ isOpen, handleConBar }) => {
 
     const handleItemClick = (index, convoId) => {
         setActiveIndex(index);
-        navigate(`/talker/c/${convoId}`);
+        if(convoId){
+            navigate(`/talker/c/${convoId}`);
+        }
     };
 
     const handleClick = (event) => {
