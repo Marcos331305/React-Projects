@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "../scripts/supabaseClient";
+import { arrangeFetchedMessages } from "../scripts/app";
 
 const initialState = {
   messages: [],
@@ -32,7 +33,8 @@ export const fetchMessages = createAsyncThunk(
       const { data, error } = await supabase
         .from("messages")
         .select("*")
-        .eq("conversation_id", conversation_id); // Filter messages by conversation_id
+        .eq("conversation_id", conversation_id) // Filter messages by conversation_id
+        .order("created_at", { ascending: true });
 
       if (error) throw error;
 
@@ -95,7 +97,9 @@ export const messageSlice = createSlice({
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loading = false;
-        state.messages = action.payload;
+        // arranging the fetchedMessages in chronological order with their creating time
+        const arrangedMessages = arrangeFetchedMessages(action.payload);
+        state.messages = arrangedMessages;
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;
