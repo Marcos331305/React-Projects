@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material'
 import UserMessageContainer from './UserMessageContainer'
 import AiMessageContainer from './AiMessageContainer'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { fetchMessages } from '../../features/messageSlice'
 
 const ChatArea = () => {
@@ -45,9 +45,9 @@ const ChatArea = () => {
                     </Typography>
                 </Box>
             ) : (
-                messages.map((msg) => (
+                messages.map((msg, index) => (
                     <Box
-                        key={msg.id}
+                        key={msg.id || index}
                         sx={{
                             display: 'flex',
                             justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start', // Align messages

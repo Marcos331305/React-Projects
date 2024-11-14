@@ -3,7 +3,7 @@ import { InputBase, IconButton, Typography, Box } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useSelector, useDispatch } from 'react-redux'
 import { addMsg, storeMsgInSupabase, talkerResponse } from '../../features/messageSlice'
-import { addConversation, createConversationInSupabase, fetchConversations, generateConversationTitle, setActiveConversationId, clearActiveConversationId } from '../../features/conversationsSlice'
+import { addConversation, createConversationInSupabase, fetchConversations, generateConversationTitle, setActiveConversationId } from '../../features/conversationsSlice'
 import { generateUniqueId } from '../../scripts/app'
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -17,8 +17,21 @@ const MsgInput = () => {
   // fetch conversation when the component Mounts
   useEffect(() => {
     dispatch(fetchConversations());
-  }, [])
-  
+
+    // Retrieve stored data from localStorage
+    const storedData = localStorage.getItem('activeConversationId');
+
+    if (storedData) {
+      try {
+        // Attempt to parse the stored data only if it's defined and not null
+        const activeConversationId = JSON.parse(storedData);
+        dispatch(setActiveConversationId(activeConversationId));
+      } catch (error) {
+        console.log("No activeConversationId Currently !!!");
+      }
+    }
+  }, []);
+
   // Initialize the Firebase Auth instance
   const auth = getAuth();
   // Get the current user
@@ -37,8 +50,8 @@ const MsgInput = () => {
     setMessage('');
     // Afterthat handling the Response-Generation
     dispatch(talkerResponse(userMessage.content));
-    
-    if(!activeConversationId){
+
+    if (!activeConversationId) {
       // Generating the conversation title and adding the conversation in redexState to update ui
       try {
         // Afterthat generating the conversationTitle for a new Conversation & wait till generating it
@@ -49,11 +62,11 @@ const MsgInput = () => {
           user_id: user.uid,
           title: conversationTitle,
         };
-        await dispatch(addConversation(conversation));
+        dispatch(addConversation(conversation));
         // and creating the conversation in dB(supabase) also
-        await dispatch(createConversationInSupabase(conversation));
+        dispatch(createConversationInSupabase(conversation));
         // also storing the message in dB(supabase)
-        await dispatch(storeMsgInSupabase({ userMessage, conversation_id: conversation.id }));
+        dispatch(storeMsgInSupabase({ userMessage, conversation_id: conversation.id }));
         // Set the new conversation as the active one and navigate to it
         dispatch(setActiveConversationId(conversation.id));
         navigate(`/talker/c/${conversation.id}`);
@@ -63,16 +76,16 @@ const MsgInput = () => {
           user_id: user.uid,
           title: 'Untitled Conversation',
         };
-        await dispatch(addConversation(conversation));
-        await dispatch(createConversationInSupabase(conversation));
-        await dispatch(storeMsgInSupabase({userMessage, conversation_id: conversation.id}));
+        dispatch(addConversation(conversation));
+        dispatch(createConversationInSupabase(conversation));
+        dispatch(storeMsgInSupabase({ userMessage, conversation_id: conversation.id }));
         // Redirect to the new conversation route
         dispatch(setActiveConversationId(conversation.id));
         navigate(`/talker/c/${conversation.id}`);
       }
-    } else{
+    } else {
       // add the message in the supaBase for the existing conversation
-      dispatch(storeMsgInSupabase({userMessage, conversation_id: activeConversationId}));
+      dispatch(storeMsgInSupabase({ userMessage, conversation_id: activeConversationId }));
     }
   };
 
