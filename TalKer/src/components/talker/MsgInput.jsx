@@ -14,9 +14,14 @@ const MsgInput = () => {
   const dispatch = useDispatch();
   const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
 
+  // Initialize the Firebase Auth instance
+  const auth = getAuth();
+  // Get the current user
+  const user = auth.currentUser;
+
   // fetch conversation when the component Mounts
   useEffect(() => {
-    dispatch(fetchConversations());
+    dispatch(fetchConversations(user.uid));
 
     // Retrieve stored data from localStorage
     const storedData = localStorage.getItem('activeConversationId');
@@ -31,11 +36,6 @@ const MsgInput = () => {
       }
     }
   }, []);
-
-  // Initialize the Firebase Auth instance
-  const auth = getAuth();
-  // Get the current user
-  const user = auth.currentUser;
 
   // handle Msg sending btn
   const handleSend = async () => {

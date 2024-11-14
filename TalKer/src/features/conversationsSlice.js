@@ -5,9 +5,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // Async thunk for fetching conversations from Supabase
 export const fetchConversations = createAsyncThunk(
   "conversations/fetchConversations",
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabase.from("conversations").select("*"); // Modify the query as needed to fit your database schema
+      const { data, error } = await supabase.from("conversations").select("*").eq('user_id',userId); // Modify the query as needed to fit your database schema
       if (error) throw error;
       return data;
     } catch (err) {
