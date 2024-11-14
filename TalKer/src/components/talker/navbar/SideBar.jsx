@@ -95,6 +95,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         setTimeout(async () => {
             await signOut(auth);
             dispatch(setAuthState()); // set the userAuthenticated state to false first that have using in authSlice
+            dispatch(clearActiveConversationId());
             navigate('/'); // Redirect the user to Home-Page(loginPage)
         }, 1000); // Duration of the logOut process
     };
