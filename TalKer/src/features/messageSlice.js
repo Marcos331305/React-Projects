@@ -73,6 +73,9 @@ export const messageSlice = createSlice({
     addMsg: (state, action) => {
       state.messages.push(action.payload);
     },
+    clearMessages: (state) =>{
+      state.messages = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -112,6 +115,6 @@ export const messageSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addMsg, incrementByAmount } = messageSlice.actions;
+export const { addMsg, clearMessages } = messageSlice.actions;
 
 export default messageSlice.reducer;

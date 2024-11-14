@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../scripts/supabaseClient"; // adjust the import path as needed
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { generateUniqueId } from "../scripts/app";
-import { json } from "react-router-dom";
 
 // Async thunk for fetching conversations from Supabase
 export const fetchConversations = createAsyncThunk(
@@ -86,6 +84,7 @@ const conversationsSlice = createSlice({
       localStorage.setItem('activeConversationId',JSON.stringify(action.payload))
     },
     clearActiveConversationId(state) {
+      localStorage.setItem('activeConversationId',JSON.stringify(null));
       state.activeConversationId = null;
     },
     selectConversation: (state, action) => {

@@ -23,7 +23,8 @@ import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { clearActiveConversationId } from '../../../features/conversationsSlice';
+import { clearActiveConversationId, setActiveConversationId } from '../../../features/conversationsSlice';
+import { clearMessages } from '../../../features/messageSlice';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [activeIndex, setActiveIndex] = useState(null);
@@ -58,6 +59,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         setActiveIndex(index);
         if(convoId){
             navigate(`/talker/c/${convoId}`);
+            dispatch(setActiveConversationId(convoId));
         }
     };
 
@@ -85,6 +87,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
 
     const handleNewConversation = () => {
         dispatch(clearActiveConversationId());
+        dispatch(clearMessages()); // Clear previous messages
         navigate('/talker');
       };
     
@@ -138,7 +141,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         {/* Conversation Area */}
                         {conversations.map((convo, index) => (
                             <ListItem
-                                key={convo.conversation_id}
+                                key={convo.conversation_id || index}
                                 onClick={() => handleItemClick(index, convo.conversation_id)}
                                 sx={{
                                     backgroundColor: activeIndex === index ? '#212121' : 'transparent',
