@@ -50,7 +50,14 @@ const MsgInput = () => {
     // after adding the message ot ui clear the msgInput field
     setMessage('');
     // Afterthat handling the Response-Generation
-    dispatch(talkerResponse(userMessage.content));
+    const { payload: talkerResponseContent } = await dispatch(talkerResponse(userMessage.content));
+    // adding talker message to reduxState for immediate uiUpdation
+    const talkerMsg = {
+      id: generateUniqueId(),
+      content: talkerResponseContent,
+      sender: 'TalKer'
+    };
+    dispatch(addMsg(talkerMsg));
 
     if (!activeConversationId) {
       // Generating the conversation title and adding the conversation in redexState to update ui
@@ -67,8 +74,10 @@ const MsgInput = () => {
         dispatch(addConversation(conversation));
         // and creating the conversation in dB(supabase) also
         dispatch(createConversationInSupabase(conversation));
-        // also storing the message in dB(supabase)
-        dispatch(storeMsgInSupabase({ userMessage, conversation_id: conversation.id }));
+        // also storing the userMsg in dB(supabase)
+        dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: conversation.id }));
+        // also storing the talKerMsg in dB(supabase)
+        dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: conversation.id }));
         // Set the new conversation as the active one and navigate to it
         dispatch(setActiveConversationId(conversation.id));
         navigate(`/talker/c/${conversation.id}`);
@@ -80,14 +89,16 @@ const MsgInput = () => {
         };
         dispatch(addConversation(conversation));
         dispatch(createConversationInSupabase(conversation));
-        dispatch(storeMsgInSupabase({ userMessage, conversation_id: conversation.id }));
+        dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: conversation.id }));
+        dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: conversation.id }));
         // Redirect to the new conversation route
         dispatch(setActiveConversationId(conversation.id));
         navigate(`/talker/c/${conversation.id}`);
       }
     } else {
-      // add the message in the supaBase for the existing conversation
-      dispatch(storeMsgInSupabase({ userMessage, conversation_id: activeConversationId }));
+      // add the userMsg and the talkerMsg in the supaBase for the existing conversation
+      dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: activeConversationId }));
+      dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: activeConversationId }));
     }
   };
 

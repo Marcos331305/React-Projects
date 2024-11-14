@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { generateUniqueId } from "../scripts/app";
 import { supabase } from "../scripts/supabaseClient";
 
 const initialState = {
@@ -47,21 +46,19 @@ export const fetchMessages = createAsyncThunk(
 // Thunk for storing a newMessage in supaBase
 export const storeMsgInSupabase = createAsyncThunk(
   "messages/storeMsgInSupabase",
-  async ({ userMessage, conversation_id }, { rejectWithValue }) => {
+  async ({ msg, conversation_id }, { rejectWithValue }) => {
     try {
       const { error } = await supabase.from("messages").insert({
-        message_id: userMessage.id,
+        message_id: msg.id,
         conversation_id: conversation_id,
-        sender: userMessage.sender,
-        content: userMessage.content,
+        sender: msg.sender,
+        content: msg.content,
       });
 
       if (error) {
-        console.log(error)
         throw error;
       }
     } catch (error) {
-      console.log(error.message)
       return rejectWithValue(error.message);
     }
   }
@@ -71,7 +68,6 @@ export const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    createMsg: (state, action) => {},
     addMsg: (state, action) => {
       state.messages.push(action.payload);
     },
@@ -87,12 +83,6 @@ export const messageSlice = createSlice({
       })
       .addCase(talkerResponse.fulfilled, (state, action) => {
         state.loading = false;
-        // Store the talkerResponse in the messages state
-        state.messages.push({
-          id: generateUniqueId(),
-          content: action.payload,
-          sender: "TalKer",
-        });
       })
       .addCase(talkerResponse.rejected, (state, action) => {
         state.loading = false;
@@ -106,13 +96,6 @@ export const messageSlice = createSlice({
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loading = false;
         state.messages = action.payload;
-        // const newMessages = action.payload;
-
-        // // Deduplicate by message id
-        // const existingMessageIds = new Set(state.messages.map(msg => msg.id));
-        // const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
-    
-        // state.messages = [...state.messages, ...uniqueNewMessages];
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;
