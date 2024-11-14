@@ -71,7 +71,7 @@ const conversationsSlice = createSlice({
   initialState: {
     conversations: [],
     activeConversationId: null,
-    selectedConversation: null,
+    activeIndex: null, // for selectedConversation
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
   },
@@ -87,8 +87,8 @@ const conversationsSlice = createSlice({
       localStorage.setItem('activeConversationId',JSON.stringify(null));
       state.activeConversationId = null;
     },
-    selectConversation: (state, action) => {
-      state.selectedConversation = action.payload;
+    setActiveIndex: (state, action) => {
+      state.activeIndex = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -109,7 +109,7 @@ const conversationsSlice = createSlice({
   },
 });
 
-export const { addConversation, setActiveConversationId, clearActiveConversationId, selectConversation } =
+export const { addConversation, setActiveConversationId, clearActiveConversationId, setActiveIndex } =
   conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

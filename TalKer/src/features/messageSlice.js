@@ -57,9 +57,11 @@ export const storeMsgInSupabase = createAsyncThunk(
       });
 
       if (error) {
+        console.log(error)
         throw error;
       }
     } catch (error) {
+      console.log(error.message)
       return rejectWithValue(error.message);
     }
   }
@@ -103,9 +105,14 @@ export const messageSlice = createSlice({
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
         state.loading = false;
-        const messages = action.payload;
-        state.messages = [...state.messages, ...messages];
-        console.log(state.messages)
+        state.messages = action.payload;
+        // const newMessages = action.payload;
+
+        // // Deduplicate by message id
+        // const existingMessageIds = new Set(state.messages.map(msg => msg.id));
+        // const uniqueNewMessages = newMessages.filter(msg => !existingMessageIds.has(msg.id));
+    
+        // state.messages = [...state.messages, ...uniqueNewMessages];
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;

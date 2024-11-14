@@ -16,7 +16,7 @@ const ChatArea = () => {
         if(conversationId){
             dispatch(fetchMessages(conversationId));
         }
-    },[conversationId]);
+    },[]);
 
     return (
         <Box
@@ -64,6 +64,5 @@ const ChatArea = () => {
         </Box>
     );
 };
-
 
 export default ChatArea;

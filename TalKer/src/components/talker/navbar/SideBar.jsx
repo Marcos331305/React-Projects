@@ -23,16 +23,17 @@ import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { clearActiveConversationId, setActiveConversationId } from '../../../features/conversationsSlice';
-import { clearMessages } from '../../../features/messageSlice';
+import { clearActiveConversationId, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
+import { clearMessages, fetchMessages } from '../../../features/messageSlice';
 
 const SideBar = ({ isOpen, handleConBar }) => {
-    const [activeIndex, setActiveIndex] = useState(null);
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
+    const activeIndex = useSelector((state) => state.conversations.activeIndex);
     // fetch conversationsState from the conversationsSlice to use in sideBars ui
     const conversations = useSelector((state) => state.conversations.conversations);
 
@@ -51,13 +52,26 @@ const SideBar = ({ isOpen, handleConBar }) => {
 
         return () => unsubscribe(); // Clean up subscription on unmount
     }, []);
+    // useEffect for persisted active Conversation Highlighting :->
+    // Effect to set the activeIndex based on activeConversationId
+    useEffect(() => {
+        const activeConversation = conversations.find(
+            (convo) => convo.conversation_id === activeConversationId
+        );
+        if (activeConversation) {
+            const index = conversations.indexOf(activeConversation);
+            dispatch(setActiveIndex(index));
+        }
+    }, [activeConversationId, conversations]);
 
     // Check if screen size is medium or larger
     const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
     const handleItemClick = (index, convoId) => {
-        setActiveIndex(index);
-        if(convoId){
+        setActiveIndex(index)
+        if (convoId) {
+            // fetch the messages immediately
+            dispatch(fetchMessages(convoId));
             navigate(`/talker/c/${convoId}`);
             dispatch(setActiveConversationId(convoId));
         }
@@ -86,11 +100,12 @@ const SideBar = ({ isOpen, handleConBar }) => {
     };
 
     const handleNewConversation = () => {
+        dispatch(setActiveIndex(null));
         dispatch(clearActiveConversationId());
         dispatch(clearMessages()); // Clear previous messages
         navigate('/talker');
-      };
-    
+    };
+
     return (
         <>
             <Drawer anchor="left" open={isOpen} onClose={handleConBar}>

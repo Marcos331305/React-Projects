@@ -45,6 +45,7 @@ const MsgInput = () => {
       content: cleanedMessage, // The message content
       sender: 'user' // Who sent the message: 'user' or 'TalKer'
     };
+    // adding the message in reduxState for immediate uiUpdation
     dispatch(addMsg(userMessage));
     // after adding the message ot ui clear the msgInput field
     setMessage('');
@@ -62,6 +63,7 @@ const MsgInput = () => {
           user_id: user.uid,
           title: conversationTitle,
         };
+        // adding the conversation in reduxState for immediate uiUpdation
         dispatch(addConversation(conversation));
         // and creating the conversation in dB(supabase) also
         dispatch(createConversationInSupabase(conversation));

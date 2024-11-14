@@ -8,21 +8,27 @@ import {
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SideBar from './SideBar';
-import { clearActiveConversationId } from '../../../features/conversationsSlice';
-import { useDispatch } from 'react-redux';
+import { clearActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { clearMessages } from '../../../features/messageSlice';
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const activeIndex = useSelector((state) => state.conversations.activeIndex);
 
   const handleConBar = () => {
     setIsOpen(!isOpen);
-};
+  };
 
-const handleNewConversation = () => {
-  dispatch(clearActiveConversationId());
-  navigate('/talker');
-};
+  const handleNewConversation = () => {
+    dispatch(setActiveIndex(null));
+    dispatch(clearActiveConversationId());
+    dispatch(clearMessages()); // Clear previous messages
+    navigate('/talker');
+  };
 
   return (
     <>
