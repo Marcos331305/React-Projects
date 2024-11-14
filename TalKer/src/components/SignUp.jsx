@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleSignup } from '../features/authSlice'
+import { clearErrors, handleSignup } from '../features/authSlice'
 import Loading from "./Loading.jsx";
 
 // Material UI Imports
@@ -134,6 +134,7 @@ export default function Login() {
   };
 
   const handleLoginClick = () => {
+    dispatch(clearErrors());
     navigate('/');
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { handleLogin } from '../features/authSlice'
+import { clearErrors, handleLogin } from '../features/authSlice'
 import Loading from "./Loading";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -129,6 +129,7 @@ export default function Login() {
   };
 
   const handleSignupClick = () => {
+    dispatch(clearErrors());
     navigate('/signUp');
   };
 

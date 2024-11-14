@@ -148,6 +148,9 @@ export const authSlice = createSlice({
     setAuthState: (state) => {
       state.isAuthenticated = false;
     },
+    clearErrors: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -200,6 +203,6 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setAuthState } = authSlice.actions;
+export const { setAuthState, clearErrors } = authSlice.actions;
 
 export default authSlice.reducer;
