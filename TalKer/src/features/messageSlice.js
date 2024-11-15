@@ -96,10 +96,10 @@ export const messageSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMessages.fulfilled, (state, action) => {
-        state.loading = false;
         // arranging the fetchedMessages in chronological order with their creating time
         const arrangedMessages = arrangeFetchedMessages(action.payload);
         state.messages = arrangedMessages;
+        state.loading = false;
       })
       .addCase(fetchMessages.rejected, (state, action) => {
         state.loading = false;

@@ -4,19 +4,22 @@ import UserMessageContainer from './UserMessageContainer'
 import AiMessageContainer from './AiMessageContainer'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { fetchMessages } from '../../features/messageSlice'
+import { clearMessages, fetchMessages } from '../../features/messageSlice'
+import Loading from '../Loading'
 
 const ChatArea = () => {
-    const  { conversationId }  = useParams(); // getting the conversationId from the routeParameters
-    const messages = useSelector((state) => state.messages.messages);
+    const { conversationId: conversationIdAsString } = useParams(); // getting the conversationId from the routeParameters
+    const conversationId = conversationIdAsString ? Number(conversationIdAsString) : null;
     const dispatch = useDispatch();
+    const messages = useSelector((state) => state.messages.messages);
+    const loading = useSelector((state) => state.messages.loading);
 
     // getting the conversationMessages only if the conversationId is available
     useEffect(() => {
-        if(conversationId){
+        if (conversationId) {
             dispatch(fetchMessages(conversationId));
         }
-    },[]);
+    }, []);
 
     return (
         <Box
@@ -26,6 +29,8 @@ const ChatArea = () => {
                 borderRadius: '8px', // Optional: rounded corners
             }}
         >
+            {/* Loading View */}
+            {/* <Loading loading={loading} message={'Loading Conversation, please wait...'} /> */}
             {/* User Messages & their Responses */}
             {messages.length === 0 ? (
                 <Box sx={{
@@ -41,7 +46,7 @@ const ChatArea = () => {
                         fontWeight: 600,
                         color: 'white'
                     }}>
-                        What can I help with?
+                        { loading ? null : 'What can I help with?' }
                     </Typography>
                 </Box>
             ) : (

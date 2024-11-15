@@ -26,7 +26,7 @@ export const createConversationInSupabase = createAsyncThunk(
         .from("conversations") // Replace with your actual table name
         .insert([
           {
-            conversation_id: conversation.id, // Generate a unique ID for the conversation
+            conversation_id: conversation.conversation_id, // Generate a unique ID for the conversation
             user_id: conversation.user_id,
             title: conversation.title,
           },
@@ -77,7 +77,7 @@ const conversationsSlice = createSlice({
   },
   reducers: {
     addConversation: (state, action) => {
-      state.conversations.push(action.payload);
+      state.conversations = [...state.conversations, action.payload];
     },
     setActiveConversationId(state, action) {
       state.activeConversationId = action.payload;

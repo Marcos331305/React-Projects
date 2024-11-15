@@ -62,19 +62,20 @@ const SideBar = ({ isOpen, handleConBar }) => {
             const index = conversations.indexOf(activeConversation);
             dispatch(setActiveIndex(index));
         }
-    }, [activeConversationId, conversations]);
+    }, [activeConversationId, conversations, dispatch]);
 
     // Check if screen size is medium or larger
     const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
     const handleItemClick = (index, convoId) => {
-        setActiveIndex(index)
-        if (convoId) {
-            // fetch the messages immediately
-            dispatch(fetchMessages(convoId));
-            navigate(`/talker/c/${convoId}`);
-            dispatch(setActiveConversationId(convoId));
-        }
+        // First, set the active conversation ID and index
+        dispatch(setActiveConversationId(convoId)); 
+        dispatch(setActiveIndex(index)); 
+        // Then, fetch the messages for the selected conversation
+        dispatch(fetchMessages(convoId));
+        // Finally, navigate to the selected conversation route & close the sideBar
+        navigate(`/talker/c/${convoId}`);
+        handleConBar();
     };
 
     const handleClick = (event) => {
@@ -105,6 +106,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         dispatch(clearActiveConversationId());
         dispatch(clearMessages()); // Clear previous messages
         navigate('/talker');
+        handleConBar();
     };
 
     return (
@@ -172,6 +174,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                 <ListItemText
                                     primary={convo.title}
                                     sx={{
+                                        mr: '5px',
                                         color: '#ECECEC',
                                         fontSize: '14px',
                                         fontWeight: 400,
