@@ -49,7 +49,7 @@ export const generateConversationTitle = createAsyncThunk(
   async (message, { rejectWithValue }) => {
     try {
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_TALKER_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
       // Combine all message texts into one input string
       // const conversationText = messages.map(msg => msg.text).join(' ');

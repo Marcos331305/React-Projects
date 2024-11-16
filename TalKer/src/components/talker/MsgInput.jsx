@@ -51,14 +51,19 @@ const MsgInput = () => {
     dispatch(addMsg(userMessage));
     setMessage(''); // Clear the input field
 
-    // Generate TalKer response after user message is dispatched
-    const { payload: talkerResponseContent } = await dispatch(talkerResponse(userMessage.content));
+    // Adding talkerMessage immediately for better exprience
     const talkerMsg = {
       id: generateUniqueId(),
-      content: talkerResponseContent,
+      content: '',
       sender: 'TalKer'
     };
     dispatch(addMsg(talkerMsg));
+
+    // Generate TalKer response & update the messageContent of added talkerMessage in reduxState
+    const { payload: talkerResponseObj } = await dispatch(talkerResponse({ prompt: userMessage.content, dummyMsgId: talkerMsg.id }));
+    const talkerResponseContent = talkerResponseObj.talkerResponse;
+    // // And now when the talkerResponse comes update the talkerMsg for storing in supabase
+    const updatedTalkerMsg = {...talkerMsg, content: talkerResponseContent};
 
     if (!activeConversationId) {
       try {
@@ -84,12 +89,12 @@ const MsgInput = () => {
         // Save the new conversation and messages to Supabase
         dispatch(createConversationInSupabase(conversation));
         dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: conversation.conversation_id }));
-        dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: conversation.conversation_id }));
+        dispatch(storeMsgInSupabase({ msg: updatedTalkerMsg, conversation_id: conversation.conversation_id }));
       } catch (error) {
         const untitledConversation = {
           conversation_id: generateUniqueId(),
           user_id: user.uid,
-          title: 'Untitled Conversation'
+          title: 'New Chat'
         };
 
         dispatch(addConversation(untitledConversation));
@@ -103,11 +108,11 @@ const MsgInput = () => {
 
         dispatch(createConversationInSupabase(untitledConversation));
         dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: untitledConversation.conversation_id }));
-        dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: untitledConversation.conversation_id }));
+        dispatch(storeMsgInSupabase({ msg: updatedTalkerMsg, conversation_id: untitledConversation.conversation_id }));
       }
     } else {
       dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: activeConversationId }));
-      dispatch(storeMsgInSupabase({ msg: talkerMsg, conversation_id: activeConversationId }));
+      dispatch(storeMsgInSupabase({ msg: updatedTalkerMsg, conversation_id: activeConversationId }));
     }
   };
 

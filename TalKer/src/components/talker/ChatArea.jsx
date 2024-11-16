@@ -61,7 +61,7 @@ const ChatArea = () => {
                         {msg.sender === 'user' ? (
                             <UserMessageContainer message={msg.content} />
                         ) : (
-                            <AiMessageContainer message={msg.content} />
+                            <AiMessageContainer message={msg.content} isLoading={loading && msg.sender === 'TalKer' && !msg.content} />
                         )}
                     </Box>
                 ))

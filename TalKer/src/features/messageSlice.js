@@ -12,13 +12,13 @@ const initialState = {
 // Thunk for generating the AiResponse/message
 export const talkerResponse = createAsyncThunk(
   "messages/talkerResponse",
-  async (prompt, { rejectWithValue }) => {
+  async ({ prompt, dummyMsgId }, { rejectWithValue }) => {
     try {
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_TALKER_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
       const result = await model.generateContent(prompt);
       const talkerResponse = result.response.text();
-      return talkerResponse;
+      return { talkerResponse, dummyMsgId };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -50,13 +50,12 @@ export const storeMsgInSupabase = createAsyncThunk(
   "messages/storeMsgInSupabase",
   async ({ msg, conversation_id }, { rejectWithValue }) => {
     try {
-      const { error } = await supabase.from("messages").insert({
+      const { error } = await supabase.from("messages").insert([{
         message_id: msg.id,
         conversation_id: conversation_id,
         sender: msg.sender,
         content: msg.content,
-      });
-
+      }]);
       if (error) {
         throw error;
       }
@@ -73,7 +72,8 @@ export const messageSlice = createSlice({
     addMsg: (state, action) => {
       state.messages.push(action.payload);
     },
-    clearMessages: (state) =>{
+    updateMsgContent: (state, action) => {},
+    clearMessages: (state) => {
       state.messages = [];
     },
   },
@@ -84,11 +84,17 @@ export const messageSlice = createSlice({
         state.error = null;
       })
       .addCase(talkerResponse.fulfilled, (state, action) => {
-        state.loading = false;
+        const { talkerResponse, dummyMsgId } = action.payload;
+        // Find the existing message by dummyMsgId and update its content
+        const existingTalkerMsg = state.messages.find(msg => msg.id === dummyMsgId);
+        if(existingTalkerMsg){
+          existingTalkerMsg.content = talkerResponse; 
+        }
       })
       .addCase(talkerResponse.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        console.log(state.error)
       })
       // handling action's for fetchingMessages
       .addCase(fetchMessages.pending, (state) => {

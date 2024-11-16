@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import ReactMarkdown from 'react-markdown';
 
@@ -20,7 +20,7 @@ const Logo = styled('img')({
     height: '20px',
 });
 
-const AiMessageContainer = ({ message }) => {
+const AiMessageContainer = ({ message, isLoading }) => {
     return (
         <Container>
             {/* Box for the logo */}
@@ -44,8 +44,11 @@ const AiMessageContainer = ({ message }) => {
                 wordBreak: 'break-word',
                 marginTop: '-13px',
             }}>
-                {/* Using ReactMarkdown to render the message */}
-                <ReactMarkdown>{message}</ReactMarkdown>
+                {isLoading ? (
+                    <Typography sx={{ color: '#757575' }}>Generating Response...</Typography> // Placeholder
+                ) : (
+                    <ReactMarkdown>{message}</ReactMarkdown>
+                )}
             </Box>
         </Container>
     );
