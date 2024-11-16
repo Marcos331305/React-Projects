@@ -45,7 +45,7 @@ const AiMessageContainer = ({ message, isLoading }) => {
                 marginTop: '-13px',
             }}>
                 {isLoading ? (
-                    <Typography sx={{ color: '#757575' }}>Generating Response...</Typography> // Placeholder
+                    <Typography sx={{ color: '#757575', mt: '18px' }}>Generating, please wait...</Typography>
                 ) : (
                     <ReactMarkdown>{message}</ReactMarkdown>
                 )}

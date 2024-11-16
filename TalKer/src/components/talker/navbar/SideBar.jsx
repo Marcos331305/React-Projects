@@ -25,13 +25,15 @@ import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { clearActiveConversationId, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
 import { clearMessages, fetchMessages } from '../../../features/messageSlice';
+import { Share, Edit, Delete } from '@mui/icons-material';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [anchorEl, setAnchorEl] = useState(null); // for userMenu
+    const [anchorElMore, setAnchorElMore] = useState(null); // for moreIcon
     const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
     const activeIndex = useSelector((state) => state.conversations.activeIndex);
     // fetch conversationsState from the conversationsSlice to use in sideBars ui
@@ -68,14 +70,21 @@ const SideBar = ({ isOpen, handleConBar }) => {
     const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
 
     const handleItemClick = (index, convoId) => {
-        // First, set the active conversation ID and index
-        dispatch(setActiveConversationId(convoId)); 
-        dispatch(setActiveIndex(index)); 
-        // Then, fetch the messages for the selected conversation
-        dispatch(fetchMessages(convoId));
-        // Finally, navigate to the selected conversation route & close the sideBar
-        navigate(`/talker/c/${convoId}`);
-        handleConBar();
+        // Check if the clicked conversation is already the active one
+        if (convoId !== activeConversationId) {
+            // First, set the active conversation ID and index
+            dispatch(setActiveConversationId(convoId));
+            dispatch(setActiveIndex(index));
+
+            // Then, fetch the messages for the selected conversation
+            dispatch(fetchMessages(convoId));
+
+            // Finally, navigate to the selected conversation route
+            navigate(`/talker/c/${convoId}`);
+
+            // Close the sidebar only if the conversation is different
+            handleConBar();
+        }
     };
 
     const handleClick = (event) => {
@@ -108,6 +117,32 @@ const SideBar = ({ isOpen, handleConBar }) => {
         navigate('/talker');
         handleConBar();
     };
+
+    // moreOptions Handling
+    const handleClickMore = (event) => {
+        setAnchorElMore(event.currentTarget); // Open Popover when More icon is clicked
+    };
+
+    const handleCloseMore = () => {
+        setAnchorElMore(null); // Close Popover when clicked outside
+    };
+
+    const handleShare = () => {
+        console.log('Share option clicked');
+        handleCloseMore();
+    };
+
+    const handleRename = () => {
+        console.log('Rename option clicked');
+        handleCloseMore();
+    };
+
+    const handleDelete = () => {
+        console.log('Delete option clicked');
+        handleCloseMore();
+    };
+
+    const openMore = Boolean(anchorElMore);
 
     return (
         <>
@@ -186,15 +221,65 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                 />
                                 {activeIndex === index && (
                                     <ListItemIcon sx={{ marginLeft: 'auto', justifyContent: 'flex-end' }}>
-                                        <MoreHorizIcon color='primary' />
+                                        <IconButton onClick={handleClickMore}>
+                                            <MoreHorizIcon color='primary' />
+                                        </IconButton>
                                     </ListItemIcon>
                                 )}
                             </ListItem>
-
                         ))}
                     </List>
+                    {/* moreOptions Menu */}
+                    <Popover
+                        open={openMore}
+                        anchorEl={anchorElMore}
+                        onClose={handleCloseMore}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        sx={{
+                            '& .MuiPaper-root': {
+                                borderRadius: '16px',
+                            },
+                        }}
+                    >
+                        <List sx={{ width: 125, bgcolor: '#2F2F2F', border: '1px solid #444343' }}>
+                            <ListItem onClick={handleShare}>
+                                <Share fontSize='small' sx={{ color: 'white', marginRight: 1 }} />
+                                <ListItemText primary="Share" sx={{
+                                    color: 'white',
+                                    '& .MuiTypography-root': {
+                                        fontSize: '14px',
+                                    },
+                                }} />
+                            </ListItem>
+                            <ListItem onClick={handleRename}>
+                                <Edit fontSize='small' sx={{ color: 'white', marginRight: 1 }} />
+                                <ListItemText primary="Rename" sx={{
+                                    color: 'white',
+                                    '& .MuiTypography-root': {
+                                        fontSize: '14px',
+                                    },
+                                }} />
+                            </ListItem>
+                            <ListItem onClick={handleDelete}>
+                                <Delete fontSize='small' sx={{ color: '#F93A37', marginRight: 1 }} />
+                                <ListItemText primary="Delete" sx={{
+                                    color: '#F93A37',
+                                    '& .MuiTypography-root': {
+                                        fontSize: '14px',
+                                    },
+                                }} />
+                            </ListItem>
+                        </List>
+                    </Popover>
 
-                    {/* userAccount */}
+                    {/* userAccount section */}
                     <Box onClick={handleClick} sx={{ display: 'flex', alignItems: 'center', py: '8px', px: '14px', marginTop: 'auto', backgroundColor: open ? '#212121' : 'transparent', }}>
                         <Avatar alt="User Avatar" src={(user) && user.photoURL} />
                         <Box sx={{ marginLeft: 1 }}>
