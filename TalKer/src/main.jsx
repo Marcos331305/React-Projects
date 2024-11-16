@@ -8,16 +8,19 @@ import { store } from './redux/store.js'
 import { Provider } from 'react-redux'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { HelmetProvider } from 'react-helmet-async';
 import theme from './scripts/app.js'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <ToastContainer />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <ToastContainer />
+        <HelmetProvider>
           <App />
-        </ThemeProvider>
+        </HelmetProvider>
+      </ThemeProvider>
     </Provider>
   </StrictMode>,
 )

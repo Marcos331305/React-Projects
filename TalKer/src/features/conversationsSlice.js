@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../scripts/supabaseClient"; // adjust the import path as needed
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { arrangeFetchedMessages } from "../scripts/app";
 
 // Async thunk for fetching conversations from Supabase
 export const fetchConversations = createAsyncThunk(
@@ -75,8 +76,6 @@ export const generateConversationTitle = createAsyncThunk(
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_TALKER_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
-      // Combine all message texts into one input string
-      // const conversationText = messages.map(msg => msg.text).join(' ');
       const conversationText = message;
 
       // Modify the prompt to instruct the model to generate a title
@@ -96,10 +95,10 @@ const conversationsSlice = createSlice({
     conversations: [],
     activeConversationId: null,
     activeIndex: null, // for selectedConversation
+    conversation: null, // shared conversation
+    messages: [], // messages of sharedConversation
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
-    error: null,
-    conversation: null,
-    messages: []
+    error: null
   },
   reducers: {
     addConversation: (state, action) => {
@@ -139,9 +138,11 @@ const conversationsSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(fetchConversationWithMessages.fulfilled, (state, action) => {
-        state.status = 'succeeded';
         state.conversation = action.payload; // Contains both conversation and messages
-        state.messages = action.payload.messages;
+        const messages = action.payload.messages;
+        const arrangedMessages = arrangeFetchedMessages(messages);
+        state.messages = arrangedMessages;
+        state.status = 'succeeded';
       })
       .addCase(fetchConversationWithMessages.rejected, (state, action) => {
         state.status = 'failed';

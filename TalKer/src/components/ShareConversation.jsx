@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { format } from 'date-fns';
+import { Helmet } from 'react-helmet-async';
 import { Typography, Box } from '@mui/material';
 import AiMessageContainer from './talker/AiMessageContainer';
 import UserMessageContainer from './talker/UserMessageContainer';
@@ -19,31 +20,27 @@ const ShareConversation = () => {
     }
   }, [conversationIdAsString, dispatch]);
 
-  const conversationDate = '2024-11-16'; // Replace with the actual conversation creation date
-  // const messages = [
-  //   { sender: 'user', content: 'Hello, how are you?' },
-  //   { sender: 'TalKer', content: 'I am doing well, thank you!' },
-  //   { sender: 'user', content: 'Great! Can you help me with coding?' },
-  //   { sender: 'TalKer', content: 'yes i can help you in coding , tell me what queries you have' }
-  //   // Add more messages as needed
-  // ];
-
   return (
-    <Box sx={{ px: 2, pt: 2, maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ px: 2, pt: { xs: 2, sm: '32px' }, maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* React Helmet for Dynamic Title */}
+      <Helmet>
+        <title>{conversation ? `TalKer - ${conversation.title}` : 'TalKer'}</title>
+      </Helmet>
+
       {/* Conversation heading & creation date */}
       <Box sx={{
         borderBottom: '1px solid #ececec'
       }}>
-        <Typography sx={{ marginBottom: '12px', color: '#ececec', fontSize: '30px', fontWeight: 550, lineHeight: '37.5px' }}>
-          { conversation && conversation.title }
+        <Typography sx={{ marginBottom: {xs: '12px', sm: '16px'}, color: '#ececec', fontSize: '30px', fontWeight: 550, lineHeight: '37.5px' }}>
+          {conversation && conversation.title}
         </Typography>
-        <Typography variant="body1" sx={{ marginBottom: '12px', color: '#B4B4B4' }}>
-        {conversation && format(new Date(conversation.created_at), 'MMMM dd, yyyy')}
+        <Typography variant="body1" sx={{ marginBottom: {xs: '12px', sm: '16px'}, color: '#B4B4B4' }}>
+          {conversation && format(new Date(conversation.created_at), 'MMMM dd, yyyy')}
         </Typography>
       </Box>
 
       {/* Messages */}
-      <Box sx={{ mx: -2, flex: 1 }}>
+      <Box sx={{ mx: -2, flexGrow: 1 }}>
         {
           messages && messages.map((msg, index) => (
             <Box
@@ -65,7 +62,7 @@ const ShareConversation = () => {
 
       {/* Footer */}
       <Box sx={{
-        padding: '8px',
+        padding: {xs: '8px', lg: '16px'},
         textAlign: 'center',
         color: '#B4B4B4',
         position: 'fixed',
@@ -79,7 +76,6 @@ const ShareConversation = () => {
         </Typography>
       </Box>
     </Box>
-
   );
 };
 

@@ -87,7 +87,7 @@ const MsgInput = () => {
         }, 50); // 50ms delay to ensure state and UI sync
 
         // Save the new conversation and messages to Supabase
-        dispatch(createConversationInSupabase(conversation));
+        await dispatch(createConversationInSupabase(conversation));
         dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: conversation.conversation_id }));
         dispatch(storeMsgInSupabase({ msg: updatedTalkerMsg, conversation_id: conversation.conversation_id }));
       } catch (error) {
