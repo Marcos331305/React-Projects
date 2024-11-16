@@ -42,7 +42,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/talker/share/:conversationId", // Public share link route
-    element: <ShareConversation /> // Component for the shareable link
+    element: <ShareConversation />
   }
 ]);
 

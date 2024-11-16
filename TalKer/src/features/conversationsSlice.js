@@ -7,12 +7,36 @@ export const fetchConversations = createAsyncThunk(
   "conversations/fetchConversations",
   async (userId, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabase.from("conversations").select("*").eq('user_id',userId); // Modify the query as needed to fit your database schema
+      const { data, error } = await supabase
+        .from("conversations")
+        .select("*")
+        .eq("user_id", userId); // Modify the query as needed to fit your database schema
       if (error) throw error;
       return data;
     } catch (err) {
       return rejectWithValue(err.message);
     }
+  }
+);
+
+// Async thunk for fetching conversation & related messages from Supabase
+export const fetchConversationWithMessages = createAsyncThunk(
+  'conversation/fetchWithMessages',
+  async (conversationId) => {
+    const { data, error } = await supabase
+      .from('conversations')
+      .select(`*, messages(*)`) // Fetch related messages using Supabase's relational syntax
+      .eq('conversation_id', conversationId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (data.length === 0) {
+      throw new Error('Conversation not found');
+    }
+
+    return data[0]; // Assuming the conversation ID is unique
   }
 );
 
@@ -74,6 +98,8 @@ const conversationsSlice = createSlice({
     activeIndex: null, // for selectedConversation
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
+    conversation: null,
+    messages: []
   },
   reducers: {
     addConversation: (state, action) => {
@@ -81,10 +107,13 @@ const conversationsSlice = createSlice({
     },
     setActiveConversationId(state, action) {
       state.activeConversationId = action.payload;
-      localStorage.setItem('activeConversationId',JSON.stringify(action.payload))
+      localStorage.setItem(
+        "activeConversationId",
+        JSON.stringify(action.payload)
+      );
     },
     clearActiveConversationId(state) {
-      localStorage.setItem('activeConversationId',JSON.stringify(null));
+      localStorage.setItem("activeConversationId", JSON.stringify(null));
       state.activeConversationId = null;
     },
     setActiveIndex: (state, action) => {
@@ -93,7 +122,7 @@ const conversationsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    // handle fetchingConversations action's
+      // handle fetchingConversations action's
       .addCase(fetchConversations.pending, (state) => {
         state.status = "loading";
       })
@@ -104,12 +133,28 @@ const conversationsSlice = createSlice({
       .addCase(fetchConversations.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      // handle fethcingConversatinWithMsg action's
+      .addCase(fetchConversationWithMessages.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchConversationWithMessages.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.conversation = action.payload; // Contains both conversation and messages
+        state.messages = action.payload.messages;
+      })
+      .addCase(fetchConversationWithMessages.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
       });
-    // handle 
   },
 });
 
-export const { addConversation, setActiveConversationId, clearActiveConversationId, setActiveIndex } =
-  conversationsSlice.actions;
+export const {
+  addConversation,
+  setActiveConversationId,
+  clearActiveConversationId,
+  setActiveIndex,
+} = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

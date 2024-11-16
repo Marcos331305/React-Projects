@@ -26,12 +26,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { clearActiveConversationId, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
 import { clearMessages, fetchMessages } from '../../../features/messageSlice';
 import { Share, Edit, Delete } from '@mui/icons-material';
+import ShareDialog from './ShareDialog';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [shareDialogOpen, setShareDialogOpen] = useState(false); // for shareOption
     const [anchorEl, setAnchorEl] = useState(null); // for userMenu
     const [anchorElMore, setAnchorElMore] = useState(null); // for moreIcon
     const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
@@ -127,9 +129,13 @@ const SideBar = ({ isOpen, handleConBar }) => {
         setAnchorElMore(null); // Close Popover when clicked outside
     };
 
-    const handleShare = () => {
-        console.log('Share option clicked');
+    const handleOpenShareDialog = () => {
+        setShareDialogOpen(true);
         handleCloseMore();
+    };
+
+    const handleCloseShareDialog = () => {
+        setShareDialogOpen(false);
     };
 
     const handleRename = () => {
@@ -248,8 +254,8 @@ const SideBar = ({ isOpen, handleConBar }) => {
                             },
                         }}
                     >
-                        <List sx={{ width: 125, bgcolor: '#2F2F2F', border: '1px solid #444343' }}>
-                            <ListItem onClick={handleShare}>
+                        <List sx={{ width: 125, bgcolor: '#2F2F2F' }}>
+                            <ListItem onClick={handleOpenShareDialog}>
                                 <Share fontSize='small' sx={{ color: 'white', marginRight: 1 }} />
                                 <ListItemText primary="Share" sx={{
                                     color: 'white',
@@ -278,6 +284,10 @@ const SideBar = ({ isOpen, handleConBar }) => {
                             </ListItem>
                         </List>
                     </Popover>
+
+                    {/* moreOption Dialog's */}
+                    {/* shareDialog */}
+                    <ShareDialog open={shareDialogOpen} handleClose={handleCloseShareDialog} />
 
                     {/* userAccount section */}
                     <Box onClick={handleClick} sx={{ display: 'flex', alignItems: 'center', py: '8px', px: '14px', marginTop: 'auto', backgroundColor: open ? '#212121' : 'transparent', }}>
