@@ -7,6 +7,7 @@ import SignUp from './components/SignUp.jsx'
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import TalkerUi from "./components/talker/TalkerUi.jsx";
 import Mailverification from "./components/MailVerification.jsx";
+import ShareConversation from "./components/ShareConversation.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       }
     ]
   },
+  {
+    path: "/talker/share/:conversationId", // Public share link route
+    element: <ShareConversation /> // Component for the shareable link
+  }
 ]);
 
 function App() {
