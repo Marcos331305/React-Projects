@@ -115,11 +115,14 @@ const SideBar = ({ isOpen, handleConBar }) => {
     };
 
     const handleNewConversation = () => {
-        dispatch(setActiveIndex(null));
-        dispatch(clearActiveConversationId());
-        dispatch(clearMessages()); // Clear previous messages
-        navigate('/talker');
-        handleConBar();
+        if (activeConversationId !== null) {
+            console.log('triggered ->>>')
+            dispatch(setActiveIndex(null));
+            dispatch(clearActiveConversationId());
+            dispatch(clearMessages()); // Clear previous messages
+            navigate('/talker');
+            handleConBar();
+        }
     };
 
     // moreOptions Handling
@@ -160,7 +163,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         handleConBar();
         dispatch(setActiveIndex(null));
         dispatch(clearMessages());
-        dispatch(delConversation({activeConversationId}));
+        dispatch(delConversation({ activeConversationId }));
         dispatch(delConversationFromSupabase(activeConversationId));
         dispatch(clearActiveConversationId());
         navigate('/talker');

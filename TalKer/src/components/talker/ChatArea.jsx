@@ -4,8 +4,8 @@ import UserMessageContainer from './UserMessageContainer'
 import AiMessageContainer from './AiMessageContainer'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { clearMessages, fetchMessages } from '../../features/messageSlice'
-import Loading from '../Loading'
+import { fetchMessages } from '../../features/messageSlice'
+import Typewriter from 'typewriter-effect';
 
 const ChatArea = () => {
     const { conversationId: conversationIdAsString } = useParams(); // getting the conversationId from the routeParameters
@@ -45,8 +45,17 @@ const ChatArea = () => {
                         fontSize: '30px',
                         fontWeight: 600,
                         color: 'white'
-                    }}>
-                        What can I help with?
+                    }} component={'span'}>
+                        <Typewriter
+                            options={{
+                                strings: ['What can I help with?'],  // The text to type
+                                autoStart: true,  // Automatically start the typewriter effect
+                                loop: true,  // Continuously loop the typewriting and deleting effect
+                                delay: 100,  // Speed of typing
+                                deleteSpeed: 140,  // Speed of deleting
+                                cursorColor: 'white',  // Cursor color
+                            }}
+                        />
                     </Typography>
                 </Box>
             ) : (
