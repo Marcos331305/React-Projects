@@ -21,7 +21,7 @@ const ShareConversation = () => {
   }, [conversationIdAsString, dispatch]);
 
   return (
-    <Box sx={{ px: 2, pt: { xs: 2, sm: '32px' }, maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ px: 2, pt: { xs: 2, sm: '40px' }, maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* React Helmet for Dynamic Title */}
       <Helmet>
         <title>{conversation ? `TalKer - ${conversation.title}` : 'TalKer'}</title>
@@ -31,7 +31,7 @@ const ShareConversation = () => {
       <Box sx={{
         borderBottom: '1px solid #ececec'
       }}>
-        <Typography sx={{ marginBottom: {xs: '12px', sm: '16px'}, color: '#ececec', fontSize: '30px', fontWeight: 550, lineHeight: '37.5px' }}>
+        <Typography sx={{ marginBottom: {xs: '12px', sm: '16px'}, color: '#ececec', fontSize: {xs: '30px', sm: '36px'}, fontWeight: 550, lineHeight: '37.5px' }}>
           {conversation && conversation.title}
         </Typography>
         <Typography variant="body1" sx={{ marginBottom: {xs: '12px', sm: '16px'}, color: '#B4B4B4' }}>

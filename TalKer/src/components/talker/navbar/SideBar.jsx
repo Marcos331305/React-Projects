@@ -23,10 +23,11 @@ import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { clearActiveConversationId, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
-import { clearMessages, fetchMessages } from '../../../features/messageSlice';
+import { clearActiveConversationId, delConversation, delConversationFromSupabase, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
+import { clearMessages, delMessages, fetchMessages } from '../../../features/messageSlice';
 import { Share, Edit, Delete } from '@mui/icons-material';
 import ShareDialog from './ShareDialog';
+import DeleteDialog from './DeleteDialog';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [user, setUser] = useState(null);
@@ -34,6 +35,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [shareDialogOpen, setShareDialogOpen] = useState(false); // for shareOption
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // for deleteOption
     const [anchorEl, setAnchorEl] = useState(null); // for userMenu
     const [anchorElMore, setAnchorElMore] = useState(null); // for moreIcon
     const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
@@ -143,9 +145,25 @@ const SideBar = ({ isOpen, handleConBar }) => {
         handleCloseMore();
     };
 
-    const handleDelete = () => {
-        console.log('Delete option clicked');
+    const handleOpenDeleteDialog = () => {
+        setDeleteDialogOpen(true);
         handleCloseMore();
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setDeleteDialogOpen(false);
+        handleCloseMore();
+    };
+
+    const handleConfirmDelete = () => {
+        setDeleteDialogOpen(false);
+        handleConBar();
+        dispatch(setActiveIndex(null));
+        dispatch(clearMessages());
+        dispatch(delConversation({activeConversationId}));
+        dispatch(delConversationFromSupabase(activeConversationId));
+        dispatch(clearActiveConversationId());
+        navigate('/talker');
     };
 
     const openMore = Boolean(anchorElMore);
@@ -273,7 +291,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                     },
                                 }} />
                             </ListItem>
-                            <ListItem onClick={handleDelete}>
+                            <ListItem onClick={handleOpenDeleteDialog}>
                                 <Delete fontSize='small' sx={{ color: '#F93A37', marginRight: 1 }} />
                                 <ListItemText primary="Delete" sx={{
                                     color: '#F93A37',
@@ -297,6 +315,13 @@ const SideBar = ({ isOpen, handleConBar }) => {
                             <Typography variant="body2" color='white'>{(user) && user.email}</Typography>
                         </Box>
                     </Box>
+                    {/* deleteDialog */}
+                    <DeleteDialog
+                        open={deleteDialogOpen}
+                        onClose={handleCloseDeleteDialog}
+                        onConfirm={handleConfirmDelete}
+                    />
+
 
                     {/* menuOfUserAccount */}
                     <Popover

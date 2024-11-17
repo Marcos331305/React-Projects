@@ -46,7 +46,7 @@ const ChatArea = () => {
                         fontWeight: 600,
                         color: 'white'
                     }}>
-                        { loading ? null : 'What can I help with?' }
+                        What can I help with?
                     </Typography>
                 </Box>
             ) : (

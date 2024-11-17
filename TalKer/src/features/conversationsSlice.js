@@ -20,21 +20,40 @@ export const fetchConversations = createAsyncThunk(
   }
 );
 
+// Create an async thunk for deleting a conversation from Supabase
+export const delConversationFromSupabase = createAsyncThunk(
+  "conversations/delConversationFromSupabase",
+  async (activeConversationId, { rejectWithValue }) => {
+    try {
+      // Perform the delete operation in Supabase
+      const { error } = await supabase
+        .from("conversations")
+        .delete()
+        .eq("conversation_id", activeConversationId); // Make sure 'id' is the correct column name in your table
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      return rejectWithValue(error.message); // Return the error message in case of failure
+    }
+  }
+);
+
 // Async thunk for fetching conversation & related messages from Supabase
 export const fetchConversationWithMessages = createAsyncThunk(
-  'conversation/fetchWithMessages',
+  "conversation/fetchWithMessages",
   async (conversationId) => {
     const { data, error } = await supabase
-      .from('conversations')
+      .from("conversations")
       .select(`*, messages(*)`) // Fetch related messages using Supabase's relational syntax
-      .eq('conversation_id', conversationId);
+      .eq("conversation_id", conversationId);
 
     if (error) {
       throw new Error(error.message);
     }
 
     if (data.length === 0) {
-      throw new Error('Conversation not found');
+      throw new Error("Conversation not found");
     }
 
     return data[0]; // Assuming the conversation ID is unique
@@ -98,7 +117,7 @@ const conversationsSlice = createSlice({
     conversation: null, // shared conversation
     messages: [], // messages of sharedConversation
     status: "idle", // 'idle' | 'loading' | 'succeeded' | 'failed'
-    error: null
+    error: null,
   },
   reducers: {
     addConversation: (state, action) => {
@@ -118,6 +137,17 @@ const conversationsSlice = createSlice({
     setActiveIndex: (state, action) => {
       state.activeIndex = action.payload;
     },
+    delConversation: (state, action) => {
+      const { activeConversationId } = action.payload;
+      if (activeConversationId) {
+        // Filter out the conversation that matches the conversationId
+        const updatedConversations = state.conversations.filter(
+          (conversation) => conversation.conversation_id !== activeConversationId
+        );
+        // Update the state with the new conversations array
+        state.conversations = updatedConversations;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -135,17 +165,17 @@ const conversationsSlice = createSlice({
       })
       // handle fethcingConversatinWithMsg action's
       .addCase(fetchConversationWithMessages.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(fetchConversationWithMessages.fulfilled, (state, action) => {
         state.conversation = action.payload; // Contains both conversation and messages
         const messages = action.payload.messages;
         const arrangedMessages = arrangeFetchedMessages(messages);
         state.messages = arrangedMessages;
-        state.status = 'succeeded';
+        state.status = "succeeded";
       })
       .addCase(fetchConversationWithMessages.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.error.message;
       });
   },
@@ -156,6 +186,7 @@ export const {
   setActiveConversationId,
   clearActiveConversationId,
   setActiveIndex,
+  delConversation,
 } = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

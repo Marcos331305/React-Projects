@@ -50,12 +50,14 @@ export const storeMsgInSupabase = createAsyncThunk(
   "messages/storeMsgInSupabase",
   async ({ msg, conversation_id }, { rejectWithValue }) => {
     try {
-      const { error } = await supabase.from("messages").insert([{
-        message_id: msg.id,
-        conversation_id: conversation_id,
-        sender: msg.sender,
-        content: msg.content,
-      }]);
+      const { error } = await supabase.from("messages").insert([
+        {
+          message_id: msg.id,
+          conversation_id: conversation_id,
+          sender: msg.sender,
+          content: msg.content,
+        },
+      ]);
       if (error) {
         throw error;
       }
@@ -72,9 +74,18 @@ export const messageSlice = createSlice({
     addMsg: (state, action) => {
       state.messages.push(action.payload);
     },
-    updateMsgContent: (state, action) => {},
     clearMessages: (state) => {
       state.messages = [];
+    },
+    delMessages: (state, action) => {
+      const { activeConversationId } = action.payload; // Get the conversationId from the action payload
+      if (activeConversationId) {
+        console.log(JSON.stringify())
+        // Filter out the messages that belong to the given conversationId
+        state.messages = state.messages.filter(
+          (message) => message.conversation_id !== activeConversationId
+        );
+      }
     },
   },
   extraReducers: (builder) => {
@@ -86,15 +97,17 @@ export const messageSlice = createSlice({
       .addCase(talkerResponse.fulfilled, (state, action) => {
         const { talkerResponse, dummyMsgId } = action.payload;
         // Find the existing message by dummyMsgId and update its content
-        const existingTalkerMsg = state.messages.find(msg => msg.id === dummyMsgId);
-        if(existingTalkerMsg){
-          existingTalkerMsg.content = talkerResponse; 
+        const existingTalkerMsg = state.messages.find(
+          (msg) => msg.id === dummyMsgId
+        );
+        if (existingTalkerMsg) {
+          existingTalkerMsg.content = talkerResponse;
         }
       })
       .addCase(talkerResponse.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        console.log(state.error)
+        console.log(state.error);
       })
       // handling action's for fetchingMessages
       .addCase(fetchMessages.pending, (state) => {
@@ -115,6 +128,6 @@ export const messageSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addMsg, clearMessages } = messageSlice.actions;
+export const { addMsg, clearMessages, delMessages } = messageSlice.actions;
 
 export default messageSlice.reducer;
