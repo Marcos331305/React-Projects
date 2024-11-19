@@ -3,8 +3,12 @@ import Nav from './navbar/Nav'
 import MsgInput from './MsgInput'
 import ChatArea from './ChatArea'
 import { Box } from '@mui/material'
+import { useRef } from 'react'
 
 const TalkerUi = () => {
+  // stateLifting
+  const messageInputRef = useRef(null);
+  const chatContainerRef = useRef(null);
   return (
     <Box sx={{
       display: 'flex',
@@ -12,8 +16,8 @@ const TalkerUi = () => {
       height: '100dvh', // Full height of the viewport
     }}>
       <Nav />
-      <ChatArea />
-      <MsgInput />
+      <ChatArea messageInputRef={messageInputRef} chatContainerRef={chatContainerRef} />
+      <MsgInput messageInputRef={messageInputRef} chatContainerRef={chatContainerRef} />
     </Box>
   )
 }

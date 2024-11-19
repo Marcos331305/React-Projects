@@ -7,13 +7,18 @@ import { addConversation, createConversationInSupabase, fetchConversations, gene
 import { generateUniqueId } from '../../scripts/app'
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-const MsgInput = () => {
+const MsgInput = ({ messageInputRef, chatContainerRef }) => {
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [scrollButtonPosition, setScrollButtonPosition] = useState('-55px');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
   const conversations = useSelector((state) => state.conversations.conversations);
+  const messages = useSelector((state) => state.messages.messages);
+  const loading = useSelector((state) => state.messages.loading);
 
   // Initialize the Firebase Auth instance
   const auth = getAuth();
@@ -40,10 +45,9 @@ const MsgInput = () => {
 
   // handle Msg sending btn
   const handleSend = async () => {
-    const cleanedMessage = message.trim().replace(/\s+/g, ' ');
     const userMessage = {
       id: generateUniqueId(),
-      content: cleanedMessage,
+      content: message,
       sender: 'user'
     };
 
@@ -63,7 +67,7 @@ const MsgInput = () => {
     const { payload: talkerResponseObj } = await dispatch(talkerResponse({ prompt: userMessage.content, dummyMsgId: talkerMsg.id }));
     const talkerResponseContent = talkerResponseObj.talkerResponse;
     // // And now when the talkerResponse comes update the talkerMsg for storing in supabase
-    const updatedTalkerMsg = {...talkerMsg, content: talkerResponseContent};
+    const updatedTalkerMsg = { ...talkerMsg, content: talkerResponseContent };
 
     if (!activeConversationId) {
       try {
@@ -116,6 +120,67 @@ const MsgInput = () => {
     }
   };
 
+  // Handling Scrolling of chatArea
+  // Handle scroll behavior
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      // Show the button if not at the bottom
+      setShowScrollButton(scrollHeight - scrollTop - clientHeight > 50);
+    }
+  };
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
+  // Scroll event listener
+  useEffect(() => {
+    const chatContainer = chatContainerRef.current;
+    if (chatContainer) {
+      chatContainer.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, []);
+  // Scroll to the bottom when messages are loaded for the first time
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Runs whenever messages change (e.g., on load or new message)
+  // Scroll to the bottom when a new message is sent or a response is generated
+  useEffect(() => {
+    if (!loading) {
+      scrollToBottom();
+    }
+  }, [loading]); // Smooth scroll once loading is complete
+  // Dynamically adjust button position based on input field size and message list
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      if (messageInputRef.current) {
+        const inputFieldHeight = messageInputRef.current.scrollHeight;
+        const buttonPosition = inputFieldHeight > 100 ? '-56px' : '-56px'; // Adjust based on input height
+        setScrollButtonPosition(buttonPosition);
+      }
+    });
+
+    if (messageInputRef.current) {
+      resizeObserver.observe(messageInputRef.current); // Start observing the input field
+    }
+
+    return () => {
+      if (messageInputRef.current) {
+        resizeObserver.unobserve(messageInputRef.current); // Cleanup observer on unmount
+      }
+    };
+  }, []); // This effect runs only once when the component mounts
+
   return (
     <Box sx={{
       maxWidth: {
@@ -127,7 +192,32 @@ const MsgInput = () => {
       mx: {
         sm: 'auto'
       },
+      position: 'relative'
     }}>
+      {showScrollButton && (
+        <IconButton onClick={scrollToBottom}
+          sx={{
+            position: 'absolute', // Positioned relative to chatArea
+            top: scrollButtonPosition,
+            left: '50%', // Centered horizontally
+            transform: 'translateX(-50%)', // Center adjustment
+            backgroundColor: '#212121',
+            color: 'white',
+            borderRadius: '50%',
+            border: '1px solid #383737',
+            width: 40,
+            height: 40,
+            zIndex: 1000,
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+            '&:hover': {
+              backgroundColor: '#333333',
+            },
+          }}
+        >
+          <ArrowDownwardIcon />
+        </IconButton>
+      )}
+
       {/* Custom Input Field */}
       <Box
         sx={{
@@ -135,21 +225,33 @@ const MsgInput = () => {
           alignItems: 'center',
           backgroundColor: '#f0f2f5', // Input background color
           borderRadius: '30px', // Fully rounded
-          padding: '2px 12px', // Padding for the input box
+          padding: '6px 10px', // Padding for the input box
           backgroundColor: '#2F2F2F',
-          mx: '12px'
+          mx: '12px',
         }}
       >
-        <InputBase id='Message-Input' value={message} onChange={(e) => setMessage(e.target.value)}
+
+        <InputBase ref={messageInputRef}
+          id="Message-Input"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
           placeholder="Message TalKer"
+          multiline
+          minRows={1}  // Minimum rows the input will take initially
+          maxRows={7}  // Maximum number of rows the input can expand to
           sx={{
             flex: 1,
             fontSize: '16px',
             color: 'white',
-            padding: '8px 16px',
+            pl: '12px',
+            borderRadius: '8px',  // Rounded corners to keep the previous style
             '& .MuiInputBase-input': {
               border: 'none',
               outline: 'none',
+              overflowY: 'auto',  // Enable vertical scroll when content overflows
+              wordBreak: 'break-word',  // Ensure words break and the content wraps
+              whiteSpace: 'pre-wrap',  // Maintain newlines and spaces in the input
+              height: 'auto',  // Auto-adjust height based on content
             },
           }}
         />
@@ -161,6 +263,7 @@ const MsgInput = () => {
             borderRadius: '50%', // Fully rounded
             padding: '8px',
             marginLeft: '8px',
+            mt: 'auto',
             '&:hover': {
               backgroundColor: !message.trim() ? '#676767 !important' : 'white',
             },

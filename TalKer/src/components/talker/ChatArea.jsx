@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Box, Typography } from '@mui/material'
 import UserMessageContainer from './UserMessageContainer'
 import AiMessageContainer from './AiMessageContainer'
@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom'
 import { fetchMessages } from '../../features/messageSlice'
 import Typewriter from 'typewriter-effect';
 
-const ChatArea = () => {
+const ChatArea = ({ chatContainerRef }) => {
     const { conversationId: conversationIdAsString } = useParams(); // getting the conversationId from the routeParameters
     const conversationId = conversationIdAsString ? Number(conversationIdAsString) : null;
     const dispatch = useDispatch();
@@ -22,11 +22,12 @@ const ChatArea = () => {
     }, []);
 
     return (
-        <Box
+        <Box ref={chatContainerRef}
             sx={{
                 flexGrow: 1,
                 overflowY: 'auto', // Enable vertical scrolling
                 borderRadius: '8px', // Optional: rounded corners
+                position: 'relative',
             }}
         >
             {/* Loading View */}

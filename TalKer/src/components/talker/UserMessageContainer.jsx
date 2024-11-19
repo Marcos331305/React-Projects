@@ -17,7 +17,10 @@ const UserMessageContainer = ({ message }) => {
                 marginInline: '12px'
             }}
         >
-            <Typography variant="body1">{message}</Typography>
+            <Typography sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word'
+            }} variant="body1">{message}</Typography>
         </Box>
     );
 };
