@@ -174,7 +174,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
     return (
         <>
             <Drawer anchor="left" open={isOpen} onClose={handleConBar}>
-                <Box sx={{ width: 275, display: 'flex', flexDirection: 'column', height: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
+                <Box sx={{ width: 257, display: 'flex', flexDirection: 'column', height: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
                     <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: '6px' }}>
                         <IconButton onClick={handleConBar}>
                             <MenuOpenIcon color='primary' />
@@ -224,38 +224,56 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                 key={convo.conversation_id || index}
                                 onClick={() => handleItemClick(index, convo.conversation_id)}
                                 sx={{
-                                    backgroundColor: activeIndex === index ? '#212121' : 'transparent',
-                                    '&:hover': {
-                                        backgroundColor: isMdUp ? '#212121' : activeIndex === index ? '#212121' : 'transparent',
-                                    },
                                     display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center', // Ensures the text and icon align properly
+                                    justifyContent: 'flex-start',
+                                    alignItems: 'center',
+                                    py: activeIndex === index ? '0px' : '8px',
+                                    px: '12px',
                                 }}
                             >
-                                <ListItemText
-                                    primary={convo.title}
+                                <Box
                                     sx={{
-                                        mr: '5px',
-                                        color: '#ECECEC',
-                                        fontSize: '14px',
-                                        fontWeight: 400,
-                                        overflow: 'hidden',
-                                        whiteSpace: 'nowrap',
-                                        textOverflow: 'ellipsis',
-                                        maxWidth: activeIndex === index ? 'calc(100% - 40px)' : '100%', // Adjusts the space for the icon
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        backgroundColor: activeIndex === index ? '#212121' : 'transparent', // Apply bg color to text and icon area
+                                        borderRadius: '8px', // Optional border radius for the background effect
+
+                                        transition: 'background-color 0.3s ease', // Smooth transition for background color
                                     }}
-                                />
-                                {activeIndex === index && (
-                                    <ListItemIcon sx={{ marginLeft: 'auto', justifyContent: 'flex-end' }}>
-                                        <IconButton onClick={handleClickMore}>
-                                            <MoreHorizIcon color='primary' />
-                                        </IconButton>
-                                    </ListItemIcon>
-                                )}
+                                >
+                                    <ListItemText
+                                        primary={convo.title}
+                                        sx={{
+                                            mr: '5px',
+                                            maxWidth: activeIndex === index ? 'calc(100% - 40px)' : '100%',
+                                            px: 1,
+                                            my: 0,
+                                        }}
+                                        primaryTypographyProps={{
+                                            sx: {
+                                                fontSize: '14px',
+                                                color: '#ECECEC',
+                                                fontWeight: 400,
+                                                overflow: 'hidden',
+                                                whiteSpace: 'nowrap',
+                                                textOverflow: 'ellipsis',
+                                            },
+                                        }}
+                                    />
+                                    {activeIndex === index && (
+                                        <ListItemIcon sx={{ marginLeft: 'auto', justifyContent: 'flex-end' }}>
+                                            <IconButton onClick={handleClickMore}>
+                                                <MoreHorizIcon color='primary' />
+                                            </IconButton>
+                                        </ListItemIcon>
+                                    )}
+                                </Box>
                             </ListItem>
                         ))}
                     </List>
+
                     {/* moreOptions Menu */}
                     <Popover
                         open={openMore}
