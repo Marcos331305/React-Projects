@@ -54,3 +54,39 @@ export function arrangeFetchedMessages(messages) {
 
  return sortedBySender;
 }
+
+// function for parsingCodeandText seperately
+export const parseTalKerResponse = (message) => {
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g; // Regex to match code blocks
+  const content = []; // Array to hold both text and code
+  let lastIndex = 0; // Tracks the end of the last match
+  let match;
+
+  while ((match = codeBlockRegex.exec(message)) !== null) {
+    // Push text between code blocks
+    if (lastIndex < match.index) {
+      const text = message.slice(lastIndex, match.index).trim();
+      if (text) {
+        content.push({ type: 'text', value: text });
+      }
+    }
+
+    // Push the code block
+    content.push({
+      type: 'code',
+      language: match[1] || "plaintext", // Extract language, default to plaintext
+      value: match[2], // Extract code
+    });
+
+    lastIndex = codeBlockRegex.lastIndex; // Update lastIndex
+  }
+
+  // Add any remaining text after the last code block
+  if (lastIndex < message.length) {
+    const remainingText = message.slice(lastIndex).trim();
+    if (remainingText) {
+      content.push({ type: 'text', value: remainingText });
+    }
+  }
+  return content;
+};

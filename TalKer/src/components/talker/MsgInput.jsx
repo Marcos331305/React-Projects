@@ -121,15 +121,6 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
   };
 
   // Handling Scrolling of chatArea
-  // Handle scroll behavior
-  const handleScroll = () => {
-    if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-      // Show the button if not at the bottom
-      setShowScrollButton(scrollHeight - scrollTop - clientHeight > 50);
-    }
-  };
-  // Scroll to bottom function
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTo({
@@ -138,48 +129,62 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
       });
     }
   };
-  // Scroll event listener
   useEffect(() => {
+    // 1. Handle scroll events
     const chatContainer = chatContainerRef.current;
+    const handleScroll = () => {
+      if (chatContainer) {
+        const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+        setShowScrollButton(scrollHeight - scrollTop - clientHeight > 50);
+      }
+    };
+
     if (chatContainer) {
       chatContainer.addEventListener('scroll', handleScroll);
     }
-    return () => {
-      if (chatContainer) {
-        chatContainer.removeEventListener('scroll', handleScroll);
+
+    // 2. Scroll to bottom when messages or loading state changes
+    const scrollToBottom = () => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
       }
     };
-  }, []);
-  // Scroll to the bottom when messages are loaded for the first time
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]); // Runs whenever messages change (e.g., on load or new message)
-  // Scroll to the bottom when a new message is sent or a response is generated
-  useEffect(() => {
-    if (!loading) {
-      scrollToBottom();
+
+    if (messages.length > 0) {
+      scrollToBottom(); // Scroll to bottom on message change
     }
-  }, [loading]); // Smooth scroll once loading is complete
-  // Dynamically adjust button position based on input field size and message list
-  useEffect(() => {
+
+    if (!loading) {
+      scrollToBottom(); // Scroll to bottom when loading finishes
+    }
+
+    // 3. Dynamically adjust button position based on input height
     const resizeObserver = new ResizeObserver(() => {
       if (messageInputRef.current) {
         const inputFieldHeight = messageInputRef.current.scrollHeight;
-        const buttonPosition = inputFieldHeight > 100 ? '-56px' : '-56px'; // Adjust based on input height
+        const buttonPosition = inputFieldHeight > 100 ? '-56px' : '-56px'; // Adjust as needed
         setScrollButtonPosition(buttonPosition);
       }
     });
 
     if (messageInputRef.current) {
-      resizeObserver.observe(messageInputRef.current); // Start observing the input field
+      resizeObserver.observe(messageInputRef.current); // Observe input height changes
     }
 
+    // Cleanup functions for both scroll event listener and resize observer
     return () => {
+      if (chatContainer) {
+        chatContainer.removeEventListener('scroll', handleScroll);
+      }
+
       if (messageInputRef.current) {
-        resizeObserver.unobserve(messageInputRef.current); // Cleanup observer on unmount
+        resizeObserver.unobserve(messageInputRef.current); // Clean up observer
       }
     };
-  }, []); // This effect runs only once when the component mounts
+  }, [messages, loading]); // Dependencies: Runs on message change or loading state change
 
   return (
     <Box sx={{
@@ -232,7 +237,7 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
       >
 
         <InputBase ref={messageInputRef}
-          id="Message-Input"
+          name='Message-Input'
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Message TalKer"
