@@ -74,10 +74,12 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
         // Generate a conversation title
         const response = await dispatch(generateConversationTitle(userMessage.content));
         const conversationTitle = response.payload;
+        const now = new Date();
         const conversation = {
           conversation_id: generateUniqueId(),
           user_id: user.uid,
-          title: conversationTitle
+          title: conversationTitle,
+          created_at: now.toISOString()
         };
 
         // Add new conversation to Redux state
@@ -95,10 +97,12 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
         dispatch(storeMsgInSupabase({ msg: userMessage, conversation_id: conversation.conversation_id }));
         dispatch(storeMsgInSupabase({ msg: updatedTalkerMsg, conversation_id: conversation.conversation_id }));
       } catch (error) {
+        const now = new Date();
         const untitledConversation = {
           conversation_id: generateUniqueId(),
           user_id: user.uid,
-          title: 'New Chat'
+          title: 'New Chat',
+          created_at: now.toISOString()
         };
 
         dispatch(addConversation(untitledConversation));

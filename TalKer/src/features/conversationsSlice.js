@@ -11,7 +11,8 @@ export const fetchConversations = createAsyncThunk(
       const { data, error } = await supabase
         .from("conversations")
         .select("*")
-        .eq("user_id", userId); // Modify the query as needed to fit your database schema
+        .eq("user_id", userId) // Modify the query as needed to fit your database schema
+        .order("created_at", { ascending: false }); // Sort by created_at in descending order
       if (error) throw error;
       return data;
     } catch (err) {
@@ -121,7 +122,7 @@ const conversationsSlice = createSlice({
   },
   reducers: {
     addConversation: (state, action) => {
-      state.conversations = [...state.conversations, action.payload];
+      state.conversations = [action.payload, ...state.conversations];
     },
     setActiveConversationId(state, action) {
       state.activeConversationId = action.payload;
@@ -142,7 +143,8 @@ const conversationsSlice = createSlice({
       if (activeConversationId) {
         // Filter out the conversation that matches the conversationId
         const updatedConversations = state.conversations.filter(
-          (conversation) => conversation.conversation_id !== activeConversationId
+          (conversation) =>
+            conversation.conversation_id !== activeConversationId
         );
         // Update the state with the new conversations array
         state.conversations = updatedConversations;

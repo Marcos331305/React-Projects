@@ -17,9 +17,7 @@ export const talkerResponse = createAsyncThunk(
       const genAI = new GoogleGenerativeAI(import.meta.env.VITE_TALKER_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
       const result = await model.generateContent(prompt);
-      console.log(result)
       const talkerResponse = result.response.text();
-      console.log(talkerResponse)
       return { talkerResponse, dummyMsgId };
     } catch (error) {
       return rejectWithValue(error.message);

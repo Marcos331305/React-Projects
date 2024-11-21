@@ -209,7 +209,12 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         >
                             <ListItemText
                                 primary={
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Box onClick={handleNewConversation} sx={{
+                                        display: 'flex', alignItems: 'center', transition: 'transform 0.2s ease', // Smooth transition for scaling
+                                        '&:active': {
+                                            transform: 'scale(0.95)', // Squeeze effect on click
+                                        },
+                                    }}>
                                         <Box sx={{
                                             padding: '4px',
                                             border: '1px solid #424242',
@@ -222,7 +227,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                         }}>
                                             <img src="/talkerLogo.svg" alt="App Logo" style={{ width: '16px', height: '16px' }} />
                                         </Box>
-                                        <Typography sx={{ color: '#ECECEC', fontSize: '16px', fontWeight: 450 }}>TalKer</Typography>
+                                        <Typography sx={{ color: '#ECECEC', fontSize: '15px', fontWeight: 420 }}>TalKer</Typography>
                                     </Box>
                                 }
                             />
