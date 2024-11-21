@@ -28,12 +28,18 @@ import { clearMessages, delMessages, fetchMessages } from '../../../features/mes
 import { Share, Edit, Delete } from '@mui/icons-material';
 import ShareDialog from './ShareDialog';
 import DeleteDialog from './DeleteDialog';
+import {
+    groupConversationsByTime
+
+} from '../../../scripts/app';
+import ConversationsArea from './ConversationsArea';
 
 const SideBar = ({ isOpen, handleConBar }) => {
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [selectedConversationId, setSelectedConversationId] = useState(null);
     const [shareDialogOpen, setShareDialogOpen] = useState(false); // for shareOption
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // for deleteOption
     const [anchorEl, setAnchorEl] = useState(null); // for userMenu
@@ -41,7 +47,11 @@ const SideBar = ({ isOpen, handleConBar }) => {
     const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
     const activeIndex = useSelector((state) => state.conversations.activeIndex);
     // fetch conversationsState from the conversationsSlice to use in sideBars ui
-    const conversations = useSelector((state) => state.conversations.conversations);
+    const conversations = useSelector((state) => state.conversations.conversations || []);
+
+    // Only call the function if conversations are available
+    const groupedConversations = conversations.length > 0 ? groupConversationsByTime(conversations) : {};
+
 
     // useEffect for getting the userDetails when the component Mount's
     useEffect(() => {
@@ -116,7 +126,6 @@ const SideBar = ({ isOpen, handleConBar }) => {
 
     const handleNewConversation = () => {
         if (activeConversationId !== null) {
-            console.log('triggered ->>>')
             dispatch(setActiveIndex(null));
             dispatch(clearActiveConversationId());
             dispatch(clearMessages()); // Clear previous messages
@@ -175,7 +184,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         <>
             <Drawer anchor="left" open={isOpen} onClose={handleConBar}>
                 <Box sx={{ width: 257, display: 'flex', flexDirection: 'column', height: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: '6px' }}>
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: '12px' }}>
                         <IconButton onClick={handleConBar}>
                             <MenuOpenIcon color='primary' />
                         </IconButton>
@@ -184,7 +193,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         </IconButton>
                     </Toolbar>
 
-                    <List sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                    <List sx={{ flexGrow: 1, overflowY: 'auto', pt: '5px' }}>
                         {/* App Logo Bar */}
                         <ListItem
                             sx={{
@@ -194,7 +203,8 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                 }),
                                 justifyContent: 'center',
                                 pl: 2.5,
-                                mb: 1.2,
+                                mb: 2.5,
+                                pt: 0
                             }}
                         >
                             <ListItemText
@@ -212,66 +222,19 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                         }}>
                                             <img src="/talkerLogo.svg" alt="App Logo" style={{ width: '16px', height: '16px' }} />
                                         </Box>
-                                        <Typography sx={{ color: '#ECECEC', fontSize: '16px', fontWeight: 600 }}>TalKer</Typography>
+                                        <Typography sx={{ color: '#ECECEC', fontSize: '16px', fontWeight: 450 }}>TalKer</Typography>
                                     </Box>
                                 }
                             />
                         </ListItem>
 
                         {/* Conversation Area */}
-                        {conversations.map((convo, index) => (
-                            <ListItem
-                                key={convo.conversation_id || index}
-                                onClick={() => handleItemClick(index, convo.conversation_id)}
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'flex-start',
-                                    alignItems: 'center',
-                                    py: activeIndex === index ? '0px' : '8px',
-                                    px: '12px',
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        width: '100%',
-                                        backgroundColor: activeIndex === index ? '#212121' : 'transparent', // Apply bg color to text and icon area
-                                        borderRadius: '8px', // Optional border radius for the background effect
-
-                                        transition: 'background-color 0.3s ease', // Smooth transition for background color
-                                    }}
-                                >
-                                    <ListItemText
-                                        primary={convo.title}
-                                        sx={{
-                                            mr: '5px',
-                                            maxWidth: activeIndex === index ? 'calc(100% - 40px)' : '100%',
-                                            px: 1,
-                                            my: 0,
-                                        }}
-                                        primaryTypographyProps={{
-                                            sx: {
-                                                fontSize: '14px',
-                                                color: '#ECECEC',
-                                                fontWeight: 400,
-                                                overflow: 'hidden',
-                                                whiteSpace: 'nowrap',
-                                                textOverflow: 'ellipsis',
-                                            },
-                                        }}
-                                    />
-                                    {activeIndex === index && (
-                                        <ListItemIcon sx={{ marginLeft: 'auto', justifyContent: 'flex-end' }}>
-                                            <IconButton onClick={handleClickMore}>
-                                                <MoreHorizIcon color='primary' />
-                                            </IconButton>
-                                        </ListItemIcon>
-                                    )}
-                                </Box>
-                            </ListItem>
-                        ))}
+                        <ConversationsArea
+                            groupedConversations={groupedConversations}
+                            activeConversationId={activeConversationId}
+                            handleItemClick={handleItemClick}
+                            handleClickMore={handleClickMore}
+                        />
                     </List>
 
                     {/* moreOptions Menu */}
@@ -341,6 +304,8 @@ const SideBar = ({ isOpen, handleConBar }) => {
                         open={deleteDialogOpen}
                         onClose={handleCloseDeleteDialog}
                         onConfirm={handleConfirmDelete}
+                        selectedConversationId={selectedConversationId}
+                        setSelectedConversationId={setSelectedConversationId}
                     />
 
 
