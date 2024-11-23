@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../scripts/supabaseClient"; // adjust the import path as needed
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { arrangeFetchedMessages } from "../scripts/app";
 
 // Async thunk for fetching conversations from Supabase
 export const fetchConversations = createAsyncThunk(
@@ -13,6 +12,26 @@ export const fetchConversations = createAsyncThunk(
         .select("*")
         .eq("user_id", userId) // Modify the query as needed to fit your database schema
         .order("created_at", { ascending: false }); // Sort by created_at in descending order
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+// Async thunk for updating the conversationTitle in Supabase
+export const updateConversationTitle = createAsyncThunk(
+  "conversations/fetchConversations",
+  async (
+    { activeConversationId, activeConversationTitle },
+    { rejectWithValue }
+  ) => {
+    try {
+      const { data, error } = await supabase
+        .from("conversations")
+        .update({ title: activeConversationTitle })
+        .eq("conversation_id", activeConversationId);
       if (error) throw error;
       return data;
     } catch (err) {
@@ -150,6 +169,25 @@ const conversationsSlice = createSlice({
         state.conversations = updatedConversations;
       }
     },
+    renConversation: (state, action) => {
+      const { activeConversationId, newTitle } = action.payload;
+
+      // Map through the conversations and find the one to update
+      const updatedConversations = state.conversations.map((conversation) => {
+        if (conversation.conversation_id === activeConversationId) {
+          return {
+            ...conversation,
+            title: newTitle,
+          };
+        }
+        return conversation;
+      });
+
+      return {
+        ...state,
+        conversations: updatedConversations,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -158,8 +196,10 @@ const conversationsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchConversations.fulfilled, (state, action) => {
+        if (action.payload && Array.isArray(action.payload)) {
+          state.conversations = action.payload;
+        }
         state.status = "succeeded";
-        state.conversations = action.payload;
       })
       .addCase(fetchConversations.rejected, (state, action) => {
         state.status = "failed";
@@ -170,16 +210,13 @@ const conversationsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchConversationWithMessages.fulfilled, (state, action) => {
-        state.conversation = action.payload; // Contains both conversation and messages
-        const messages = action.payload.messages;
-        const arrangedMessages = arrangeFetchedMessages(messages);
-        state.messages = arrangedMessages;
+        state.conversations = action.payload;
         state.status = "succeeded";
       })
       .addCase(fetchConversationWithMessages.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-      });
+      })
   },
 });
 
@@ -189,6 +226,7 @@ export const {
   clearActiveConversationId,
   setActiveIndex,
   delConversation,
+  renConversation,
 } = conversationsSlice.actions;
 
 export default conversationsSlice.reducer;

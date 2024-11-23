@@ -16,7 +16,10 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <ToastContainer />
+        <ToastContainer style={{
+          margin: '8px auto', // Center the container
+          padding: '0 8px', // Add space inside the container from left and right
+        }} />
         <HelmetProvider>
           <App />
         </HelmetProvider>

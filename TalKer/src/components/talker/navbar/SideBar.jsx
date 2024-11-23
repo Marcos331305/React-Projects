@@ -4,7 +4,6 @@ import {
     List,
     ListItem,
     ListItemText,
-    ListItemIcon,
     Avatar,
     Box,
     Popover,
@@ -14,7 +13,6 @@ import {
     Typography
 } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
@@ -23,35 +21,50 @@ import { setAuthState } from '../../../features/authSlice';
 import { useState, useEffect } from 'react';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { clearActiveConversationId, delConversation, delConversationFromSupabase, setActiveConversationId, setActiveIndex } from '../../../features/conversationsSlice';
-import { clearMessages, delMessages, fetchMessages } from '../../../features/messageSlice';
+import { clearActiveConversationId, delConversation, delConversationFromSupabase, renConversation, setActiveConversationId, setActiveIndex, updateConversationTitle } from '../../../features/conversationsSlice';
+import { clearMessages, fetchMessages } from '../../../features/messageSlice';
 import { Share, Edit, Delete } from '@mui/icons-material';
 import ShareDialog from './ShareDialog';
 import DeleteDialog from './DeleteDialog';
+import RenameDialog from './RenameDialog';
+import { toast } from 'react-toastify';
 import {
     groupConversationsByTime
 
 } from '../../../scripts/app';
 import ConversationsArea from './ConversationsArea';
 
-const SideBar = ({ isOpen, handleConBar }) => {
+const SideBar = ({ isOpen, handleConBar }) => {    
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [activeConversationTitle, setActiveConversationTitle] = useState('');
     const [selectedConversationId, setSelectedConversationId] = useState(null);
+    const [renameDialogOpen, setRenameDialogOpen] = useState(false);
     const [shareDialogOpen, setShareDialogOpen] = useState(false); // for shareOption
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // for deleteOption
     const [anchorEl, setAnchorEl] = useState(null); // for userMenu
     const [anchorElMore, setAnchorElMore] = useState(null); // for moreIcon
     const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
-    const activeIndex = useSelector((state) => state.conversations.activeIndex);
     // fetch conversationsState from the conversationsSlice to use in sideBars ui
-    const conversations = useSelector((state) => state.conversations.conversations || []);
+    const { conversations = [], loading } = useSelector((state) => state.conversations || {});
+    
+    useEffect(() => {
+        if (Array.isArray(conversations) && conversations.length > 0 && activeConversationId) {
+            const activeConversation = conversations.find(
+                (convo) => convo.conversation_id === activeConversationId
+            );
+            if (activeConversation && !renameDialogOpen) {
+                setActiveConversationTitle(activeConversation.title);
+            }
+        }
+    }, [conversations, activeConversationId, renameDialogOpen]); 
 
     // Only call the function if conversations are available
-    const groupedConversations = conversations.length > 0 ? groupConversationsByTime(conversations) : {};
-
+    const groupedConversations = (Array.isArray(conversations) && conversations.length > 0)
+        ? groupConversationsByTime(conversations)
+        : {};
 
     // useEffect for getting the userDetails when the component Mount's
     useEffect(() => {
@@ -68,17 +81,6 @@ const SideBar = ({ isOpen, handleConBar }) => {
 
         return () => unsubscribe(); // Clean up subscription on unmount
     }, []);
-    // useEffect for persisted active Conversation Highlighting :->
-    // Effect to set the activeIndex based on activeConversationId
-    useEffect(() => {
-        const activeConversation = conversations.find(
-            (convo) => convo.conversation_id === activeConversationId
-        );
-        if (activeConversation) {
-            const index = conversations.indexOf(activeConversation);
-            dispatch(setActiveIndex(index));
-        }
-    }, [activeConversationId, conversations, dispatch]);
 
     // Check if screen size is medium or larger
     const isMdUp = useMediaQuery((theme) => theme.breakpoints.up('md'));
@@ -152,11 +154,6 @@ const SideBar = ({ isOpen, handleConBar }) => {
         setShareDialogOpen(false);
     };
 
-    const handleRename = () => {
-        console.log('Rename option clicked');
-        handleCloseMore();
-    };
-
     const handleOpenDeleteDialog = () => {
         setDeleteDialogOpen(true);
         handleCloseMore();
@@ -179,6 +176,53 @@ const SideBar = ({ isOpen, handleConBar }) => {
     };
 
     const openMore = Boolean(anchorElMore);
+
+    const handleRenameOpen = () => {
+        setRenameDialogOpen(true); // Ensure dialog opens
+        handleCloseMore();
+    };
+
+    const handleEditableTitle = (e) => {
+        const value = e.target.value;
+        setActiveConversationTitle(value);
+    }
+
+    const handleRenameClose = () => {
+        if (activeConversationTitle.trim() === "") {
+            // If input is empty, reset to the original title instead of closing
+            const originalTitle = conversations.find(
+                (convo) => convo.conversation_id === activeConversationId
+            )?.title;
+            setActiveConversationTitle(originalTitle || 'New Chat');
+        }
+        setRenameDialogOpen(false);
+    };
+
+    const handleRename = async() => {
+        // if inputField is empty
+        if (activeConversationTitle.trim() === "") {
+            toast.error('Title can not be empty', {
+                position: 'top-right',
+                autoClose: 1500,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                theme: 'dark',
+                style: {
+                    backgroundColor: '#333',
+                    color: '#fff',
+                    fontSize: '14px',
+                    padding: '10px 7px',
+                    borderRadius: '10px',
+                },
+            });
+            return;
+        }
+        dispatch(renConversation({ activeConversationId, newTitle: activeConversationTitle }));
+        dispatch(updateConversationTitle({ activeConversationId, activeConversationTitle }));
+        setRenameDialogOpen(false);
+    };
 
     return (
         <>
@@ -239,6 +283,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                             activeConversationId={activeConversationId}
                             handleItemClick={handleItemClick}
                             handleClickMore={handleClickMore}
+                            activeConversationTitle={activeConversationTitle}
                         />
                     </List>
 
@@ -271,7 +316,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
                                     },
                                 }} />
                             </ListItem>
-                            <ListItem onClick={handleRename}>
+                            <ListItem onClick={handleRenameOpen}>
                                 <Edit fontSize='small' sx={{ color: 'white', marginRight: 1 }} />
                                 <ListItemText primary="Rename" sx={{
                                     color: 'white',
@@ -295,6 +340,23 @@ const SideBar = ({ isOpen, handleConBar }) => {
                     {/* moreOption Dialog's */}
                     {/* shareDialog */}
                     <ShareDialog open={shareDialogOpen} handleClose={handleCloseShareDialog} />
+                    {/* deleteDialog */}
+                    <DeleteDialog
+                        open={deleteDialogOpen}
+                        onClose={handleCloseDeleteDialog}
+                        onConfirm={handleConfirmDelete}
+                        selectedConversationId={selectedConversationId}
+                        setSelectedConversationId={setSelectedConversationId}
+                    />
+                    {/* renameDialog */}
+                    <RenameDialog
+                        open={renameDialogOpen}
+                        onClose={handleRenameClose}
+                        activeConversationTitle={activeConversationTitle}
+                        handleRename={handleRename}
+                        handleEditableTitle={handleEditableTitle}
+                        setActiveConversationTitle={setActiveConversationTitle}
+                    />
 
                     {/* userAccount section */}
                     <Box onClick={handleClick} sx={{ display: 'flex', alignItems: 'center', py: '8px', px: '14px', marginTop: 'auto', backgroundColor: open ? '#212121' : 'transparent', }}>
@@ -304,15 +366,6 @@ const SideBar = ({ isOpen, handleConBar }) => {
                             <Typography variant="body2" color='white'>{(user) && user.email}</Typography>
                         </Box>
                     </Box>
-                    {/* deleteDialog */}
-                    <DeleteDialog
-                        open={deleteDialogOpen}
-                        onClose={handleCloseDeleteDialog}
-                        onConfirm={handleConfirmDelete}
-                        selectedConversationId={selectedConversationId}
-                        setSelectedConversationId={setSelectedConversationId}
-                    />
-
 
                     {/* menuOfUserAccount */}
                     <Popover
