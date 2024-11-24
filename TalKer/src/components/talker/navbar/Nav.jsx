@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { clearMessages } from '../../../features/messageSlice';
 
-const Nav = () => {
+const Nav = ({ setShowScrollButton }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,6 +27,7 @@ const Nav = () => {
     dispatch(setActiveIndex(null));
     dispatch(clearActiveConversationId());
     dispatch(clearMessages()); // Clear previous messages
+    setShowScrollButton(false);
     navigate('/talker');
   };
 
@@ -47,7 +48,7 @@ const Nav = () => {
       </AppBar>
 
       {/* rendering sideBar */}
-      <SideBar isOpen={isOpen} handleConBar={handleConBar} />
+      <SideBar isOpen={isOpen} handleConBar={handleConBar} setShowScrollButton={setShowScrollButton} />
     </>
   );
 };

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { InputBase, IconButton, Typography, Box } from '@mui/material';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useSelector, useDispatch } from 'react-redux'
 import { addMsg, storeMsgInSupabase, talkerResponse } from '../../features/messageSlice'
@@ -9,12 +11,13 @@ import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
-const MsgInput = ({ messageInputRef, chatContainerRef }) => {
-  const [showScrollButton, setShowScrollButton] = useState(false);
-  const [scrollButtonPosition, setScrollButtonPosition] = useState('-55px');
+const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShowScrollButton }) => {
+  const [showMicrophone, setShowMicrophone] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [scrollButtonPosition, setScrollButtonPosition] = useState('-55px');
   const activeConversationId = useSelector((state) => state.conversations.activeConversationId);
   const conversations = useSelector((state) => state.conversations.conversations);
   const messages = useSelector((state) => state.messages.messages);
@@ -201,7 +204,8 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
       mx: {
         sm: 'auto'
       },
-      position: 'relative'
+      position: 'relative',
+      pt: '4px'
     }}>
       {showScrollButton && (
         <IconButton onClick={scrollToBottom}
@@ -227,62 +231,86 @@ const MsgInput = ({ messageInputRef, chatContainerRef }) => {
         </IconButton>
       )}
 
-      {/* Custom Input Field */}
+      {/* InputField and SendBtn Container */}
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: '#f0f2f5', // Input background color
-          borderRadius: '30px', // Fully rounded
-          padding: '6px 10px', // Padding for the input box
-          backgroundColor: '#2F2F2F',
-          mx: '12px',
+          display: 'flex', // Set flexbox layout for proper alignment
+          alignItems: 'center', // Vertically align items
+          mx: '12px', // Horizontal margin for the container
+          gap: '6px', // Space between input field and send button
         }}
       >
-
-        <InputBase ref={messageInputRef}
-          name='Message-Input'
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Message TalKer"
-          multiline
-          minRows={1}  // Minimum rows the input will take initially
-          maxRows={7}  // Maximum number of rows the input can expand to
+        {/* Input Field Container */}
+        <Box
           sx={{
-            flex: 1,
-            fontSize: '16px',
-            color: 'white',
-            pl: '12px',
-            borderRadius: '8px',  // Rounded corners to keep the previous style
-            '& .MuiInputBase-input': {
-              border: 'none',
-              outline: 'none',
-              overflowY: 'auto',  // Enable vertical scroll when content overflows
-              wordBreak: 'break-word',  // Ensure words break and the content wraps
-              whiteSpace: 'pre-wrap',  // Maintain newlines and spaces in the input
-              height: 'auto',  // Auto-adjust height based on content
-            },
+            flex: 1, // Input container takes up available space
+            display: 'flex', // Flex for multiline input adjustments
+            alignItems: 'center', // Align items vertically
+            backgroundColor: '#2F2F2F', // Input field background
+            borderRadius: '30px', // Rounded corners
+            py: message.trim() ? '7px' : '3px',
+            pl: '7px',
+            pr: '5px'
           }}
-        />
+        >
+          <InputBase
+            ref={messageInputRef}
+            name="Message-Input"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder={isRecording ? 'Listening...' : 'Message TalKer'}
+            multiline
+            minRows={1} // Minimum rows for input
+            maxRows={7} // Maximum rows for input
+            sx={{
+              flex: 1, // Allow input to take all available space
+              fontSize: '16px',
+              color: 'white',
+              pl: '12px',
+              borderRadius: '8px',
+              '& .MuiInputBase-input': {
+                border: 'none',
+                outline: 'none',
+                overflowY: 'auto', // Enable vertical scrolling for overflow content
+                wordBreak: 'break-word', // Wrap long words
+                whiteSpace: 'pre-wrap', // Preserve white space and new lines
+                height: 'auto', // Automatically adjust height
+              },
+            }}
+          />
+              <IconButton
+                onClick={() => setIsRecording(!isRecording)} // Toggle microphone state
+                sx={{
+                  color: 'white', // Icon color
+                  marginLeft: '8px', // Add spacing from the input
+                  display: message.trim() ? 'none' : 'flex'
+                }}
+              >
+                {isRecording ? <MicOffIcon /> : <MicIcon />} {/* Conditionally render icon */}
+              </IconButton>
+        </Box>
 
         {/* Send Button */}
-        <IconButton onClick={handleSend} disabled={!message.trim()}
+        <IconButton
+          onClick={handleSend}
+          disabled={!message.trim()}
           sx={{
             backgroundColor: !message.trim() ? '#676767 !important' : 'white',
-            borderRadius: '50%', // Fully rounded
+            borderRadius: '50%', // Fully rounded button
             padding: '8px',
-            marginLeft: '8px',
-            mt: 'auto',
             '&:hover': {
               backgroundColor: !message.trim() ? '#676767 !important' : 'white',
             },
           }}
         >
-          <KeyboardArrowUpIcon sx={{
-            color: !message.trim() ? '#2F2F2F !important' : '#000000',
-          }} />
+          <KeyboardArrowUpIcon
+            sx={{
+              color: !message.trim() ? '#2F2F2F !important' : '#000000',
+            }}
+          />
         </IconButton>
       </Box>
+
 
       {/* Disclaimer message */}
       <Typography

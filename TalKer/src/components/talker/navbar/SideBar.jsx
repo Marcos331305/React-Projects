@@ -34,7 +34,7 @@ import {
 } from '../../../scripts/app';
 import ConversationsArea from './ConversationsArea';
 
-const SideBar = ({ isOpen, handleConBar }) => {    
+const SideBar = ({ isOpen, handleConBar, setShowScrollButton }) => {    
     const [user, setUser] = useState(null);
     const [clicked, setClicked] = useState(false);
     const navigate = useNavigate();
@@ -131,6 +131,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
             dispatch(setActiveIndex(null));
             dispatch(clearActiveConversationId());
             dispatch(clearMessages()); // Clear previous messages
+            setShowScrollButton(false);
             navigate('/talker');
             handleConBar();
         }
@@ -228,7 +229,7 @@ const SideBar = ({ isOpen, handleConBar }) => {
         <>
             <Drawer anchor="left" open={isOpen} onClose={handleConBar}>
                 <Box sx={{ width: 257, display: 'flex', flexDirection: 'column', height: '100%', bgcolor: '#171717', overflow: 'hidden' }}>
-                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: '12px' }}>
+                    <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: '10px' }}>
                         <IconButton onClick={handleConBar}>
                             <MenuOpenIcon color='primary' />
                         </IconButton>
