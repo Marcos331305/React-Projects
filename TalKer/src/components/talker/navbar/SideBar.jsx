@@ -88,9 +88,8 @@ const SideBar = ({ isOpen, handleConBar, setShowScrollButton }) => {
     const handleItemClick = (index, convoId) => {
         // Check if the clicked conversation is already the active one
         if (convoId !== activeConversationId) {
-            // First, set the active conversation ID and index
+            // First, set the active conversation ID and activeEffect based on that Id
             dispatch(setActiveConversationId(convoId));
-            dispatch(setActiveIndex(index));
 
             // Then, fetch the messages for the selected conversation
             dispatch(fetchMessages(convoId));
