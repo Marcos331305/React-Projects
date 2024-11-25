@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { InputBase, IconButton, Typography, Box } from '@mui/material';
+import { InputBase, IconButton, Typography, Box, Collapse } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -10,9 +10,9 @@ import { generateUniqueId } from '../../scripts/app'
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import StopIcon from "@mui/icons-material/Stop";
 
 const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShowScrollButton }) => {
-  const [showMicrophone, setShowMicrophone] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -193,20 +193,27 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
     };
   }, [messages, loading]); // Dependencies: Runs on message change or loading state change
 
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+  };
+
   return (
-    <Box sx={{
-      maxWidth: {
-        xs: '600px',
-      },
-      width: {
-        sm: '600px'
-      },
-      mx: {
-        sm: 'auto'
-      },
-      position: 'relative',
-      pt: '4px'
-    }}>
+    <Box
+      sx={{
+        maxWidth: {
+          xs: "600px",
+        },
+        width: {
+          sm: "600px",
+        },
+        mx: {
+          sm: "auto",
+        },
+        position: "relative",
+        pt: "4px",
+      }}
+    >
+      {/* scrollDown button */}
       {showScrollButton && (
         <IconButton onClick={scrollToBottom}
           sx={{
@@ -234,23 +241,23 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
       {/* InputField and SendBtn Container */}
       <Box
         sx={{
-          display: 'flex', // Set flexbox layout for proper alignment
-          alignItems: 'center', // Vertically align items
-          mx: '12px', // Horizontal margin for the container
-          gap: '6px', // Space between input field and send button
+          display: "flex",
+          alignItems: "center",
+          mx: "12px",
+          gap: "6px",
         }}
       >
         {/* Input Field Container */}
         <Box
           sx={{
-            flex: 1, // Input container takes up available space
-            display: 'flex', // Flex for multiline input adjustments
-            alignItems: 'center', // Align items vertically
-            backgroundColor: '#2F2F2F', // Input field background
-            borderRadius: '30px', // Rounded corners
-            py: message.trim() ? '7px' : '3px',
-            pl: '7px',
-            pr: '5px'
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+            backgroundColor: "#2F2F2F",
+            borderRadius: "30px",
+            py: message.trim() ? "7px" : "3px",
+            pl: "7px",
+            pr: "5px",
           }}
         >
           <InputBase
@@ -278,16 +285,16 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
               },
             }}
           />
-              <IconButton
-                onClick={() => setIsRecording(!isRecording)} // Toggle microphone state
-                sx={{
-                  color: 'white', // Icon color
-                  marginLeft: '8px', // Add spacing from the input
-                  display: message.trim() ? 'none' : 'flex'
-                }}
-              >
-                {isRecording ? <MicOffIcon /> : <MicIcon />} {/* Conditionally render icon */}
-              </IconButton>
+          <IconButton
+            onClick={toggleRecording}
+            sx={{
+              color: "white",
+              marginLeft: "8px",
+              display: message.trim() ? "none" : "flex",
+            }}
+          >
+            {isRecording ? <MicOffIcon /> : <MicIcon />}
+          </IconButton>
         </Box>
 
         {/* Send Button */}
@@ -311,12 +318,64 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
         </IconButton>
       </Box>
 
+      {/* Recording UI with Sliding Animation */}
+      <Collapse in={isRecording} timeout={300}>
+        <Box
+          sx={{
+            backgroundColor: "#2F2F2F",
+            borderRadius: "8px",
+            mt: '12px',
+            p: 2,
+            mx: '12px',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+            height: "150px", // Fixed height for the recording UI
+          }}
+        >
+          {/* Timer */}
+          <Typography
+            sx={{
+              position: "absolute",
+              top: "10px",
+              left: "10px",
+              color: "white",
+              fontSize: "14px",
+            }}
+          >
+            00:30
+          </Typography>
+
+          {/* Stop Recording */}
+          <IconButton
+            onClick={toggleRecording}
+            sx={{
+              color: "white",
+              backgroundColor: "#FF5252",
+              borderRadius: "50%",
+              mb: 2,
+              "&:hover": {
+                backgroundColor: "#FF0000",
+              },
+            }}
+          >
+            <StopIcon />
+          </IconButton>
+
+          {/* Text */}
+          <Typography sx={{ color: "white", fontSize: "16px" }}>
+            Tap to stop recording
+          </Typography>
+        </Box>
+      </Collapse>
 
       {/* Disclaimer message */}
       <Typography
         variant="body2"
         color="primary"
-        sx={{ padding: '8px', textAlign: 'center' }}
+        sx={{ padding: "8px", textAlign: "center" }}
       >
         TalKer can make mistakes. Check important info.
       </Typography>
