@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { InputBase, IconButton, Typography, Box, Collapse } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
@@ -14,6 +14,13 @@ import StopIcon from "@mui/icons-material/Stop";
 
 const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShowScrollButton }) => {
   const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef(null); // Store recognition instance in ref
+  const [accumulatedTranscript, setAccumulatedTranscript] = useState(""); // For storing the ongoing transcript
+  const [speechApiSupported, setSpeechApiSupported] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [currentTime, setCurrentTime] = useState(null);
+  const [lastRecordedTime, setLastRecordedTime] = useState("00:00");
+  const [timerId, setTimerId] = useState(null); // Store interval ID
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,7 +29,6 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
   const conversations = useSelector((state) => state.conversations.conversations);
   const messages = useSelector((state) => state.messages.messages);
   const loading = useSelector((state) => state.messages.loading);
-
   // Initialize the Firebase Auth instance
   const auth = getAuth();
   // Get the current user
@@ -193,8 +199,106 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
     };
   }, [messages, loading]); // Dependencies: Runs on message change or loading state change
 
+  // Handling voiceInput functionality
   const toggleRecording = () => {
-    setIsRecording(!isRecording);
+    setIsRecording((prev) => !prev);
+  };
+
+  const startTimer = () => {
+    setStartTime(Date.now());
+    setCurrentTime(Date.now()); // Initialize to prevent negative values
+
+    const id = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    setTimerId(id); // Save the interval ID
+    setLastRecordedTime("00:00"); // Reset only when starting a new recording
+  };
+
+  const stopTimer = () => {
+    if (timerId) {
+      clearInterval(timerId); // Stop the interval
+      setTimerId(null);
+    }
+
+    if (startTime) {
+      // Calculate elapsed time when stopping the timer
+      const diffInSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(diffInSeconds / 60);
+      const seconds = diffInSeconds % 60;
+      setLastRecordedTime(
+        `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+      );
+    }
+
+    setStartTime(null); // Reset start time
+    setCurrentTime(null); // Reset current time
+  };
+
+  const getElapsedTime = () => {
+    if (timerId) {
+      // Timer is running, calculate elapsed time
+      if (!startTime || !currentTime) return "00:00";
+      const diffInSeconds = Math.floor((currentTime - startTime) / 1000);
+      const minutes = Math.floor(diffInSeconds / 60);
+      const seconds = diffInSeconds % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    } else {
+      // Timer is stopped, show the last recorded time
+      return lastRecordedTime;
+    }
+  };
+
+  // speechRecognition using webSpeech api
+  // Initialize the recognition instance when the component is mounted
+  useEffect(() => {
+    if (!("SpeechRecognition" in window || "webkitSpeechRecognition" in window)) {
+      alert("Speech Recognition not supported in this browser.");
+    } else {
+      setSpeechApiSupported(true);
+      recognitionRef.current = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      const recognition = recognitionRef.current;
+      recognition.lang = "en-US";
+      recognition.continuous = true; // Keeps listening until stopped
+      recognition.interimResults = true; // Show interim results
+
+      // Handle speech recognition results
+      recognition.onresult = (event) => {
+        let interimTranscript = ""; // Store interim results temporarily
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            setAccumulatedTranscript((prev) => prev + " " + transcript.trim());
+          } else {
+            interimTranscript += transcript; // Append interim result
+          }
+        }
+      };
+
+      // Handle errors
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event);
+      };
+    }
+  }, []);
+  // Start speech recognition
+  const startRecognition = () => {
+    const recognition = recognitionRef.current;
+    if (recognition && speechApiSupported) {
+      recognitionRef.current.start();
+      setAccumulatedTranscript(""); // Clear previous transcript
+    }
+  };
+
+  // Stop speech recognition
+  const stopRecognition = () => {
+    const recognition = recognitionRef.current;
+    if (recognition) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      setMessage(accumulatedTranscript.trim());
+    }
   };
 
   return (
@@ -247,7 +351,7 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
           gap: "6px",
         }}
       >
-        {/* Input Field Container */}
+        {/* Input Field & recordingBtn container */}
         <Box
           sx={{
             flex: 1,
@@ -265,7 +369,7 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
             name="Message-Input"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder={isRecording ? 'Listening...' : 'Message TalKer'}
+            placeholder={(isRecording && speechApiSupported) ? 'Listening...' : 'Message TalKer'}
             multiline
             minRows={1} // Minimum rows for input
             maxRows={7} // Maximum rows for input
@@ -273,7 +377,7 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
               flex: 1, // Allow input to take all available space
               fontSize: '16px',
               color: 'white',
-              pl: '12px',
+              px: '12px',
               borderRadius: '8px',
               '& .MuiInputBase-input': {
                 border: 'none',
@@ -285,8 +389,23 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
               },
             }}
           />
+          {/* recordingBtn */}
           <IconButton
-            onClick={toggleRecording}
+            onClick={() => {
+              if (speechApiSupported) {
+                toggleRecording() // Toggling the recording state
+                if (!isRecording) {
+                  startTimer(); // Start the timer only if recording is about to begin
+                  startRecognition()
+                } else {
+                  stopTimer(); // Stop the timer when recording ends
+                  stopRecognition()
+                }
+              }
+              if (speechApiSupported === false) {
+                toggleRecording()
+              }
+            }}
             sx={{
               color: "white",
               marginLeft: "8px",
@@ -335,51 +454,61 @@ const MsgInput = ({ messageInputRef, chatContainerRef, showScrollButton, setShow
             height: "150px", // Fixed height for the recording UI
           }}
         >
-          {/* Timer */}
-          <Typography
-            sx={{
-              position: "absolute",
-              top: "10px",
-              left: "10px",
-              color: "white",
-              fontSize: "14px",
-            }}
-          >
-            00:30
-          </Typography>
+          {
+            speechApiSupported ? (
+              <>
+                {/* Timer */}
+                <Typography
+                  sx={{
+                    position: "absolute",
+                    top: "10px",
+                    left: "10px",
+                    color: "white",
+                    fontSize: "14px",
+                  }}
+                >
+                  {getElapsedTime()}
+                </Typography>
 
-          {/* Stop Recording */}
-          <IconButton
-            onClick={toggleRecording}
-            sx={{
-              color: "white",
-              backgroundColor: "#FF5252",
-              borderRadius: "50%",
-              mb: 2,
-              "&:hover": {
-                backgroundColor: "#FF0000",
-              },
-            }}
-          >
-            <StopIcon />
-          </IconButton>
+                {/* Stop Recording */}
+                <IconButton
+                  onClick={() => {
+                    stopTimer();
+                    stopRecognition();
+                  }}
+                  sx={{
+                    color: "white",
+                    borderRadius: "50%",
+                    mb: 2,
+                    border: '1px solid white',
+                  }}
+                >
+                  <StopIcon />
+                </IconButton>
 
-          {/* Text */}
-          <Typography sx={{ color: "white", fontSize: "16px" }}>
-            Tap to stop recording
-          </Typography>
+                {/* Text */}
+                <Typography sx={{ color: "white", fontSize: "16px" }}>
+                  Tap to stop recording
+                </Typography>
+              </>
+            ) : (
+              <Typography sx={{ color: "white", fontSize: "16px", textAlign: 'center', color: '#F93A37' }}>
+                Sorry, webSpeech is not supported in your browser!
+              </Typography>
+            )
+          }
         </Box>
-      </Collapse>
+      </Collapse >
 
       {/* Disclaimer message */}
-      <Typography
+      <Typography Typography
         variant="body2"
         color="primary"
         sx={{ padding: "8px", textAlign: "center" }}
       >
-        TalKer can make mistakes. Check important info.
+        TalKer can make mistakes.Check important info.
       </Typography>
-    </Box>
+    </Box >
   );
 };
 
